@@ -1,11 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
- Login
-use App\Http\Controllers\ProveedorController;
-
+use App\Http\Controllers\MateriaPrimaController;
 use App\Http\Controllers\ClienteController;
- main
+use App\Http\Controllers\ProveedorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,9 +14,9 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-// RUTAS DE CLIENTES
 Route::resource('clientes', ClienteController::class);
+Route::resource('proveedores', ProveedorController::class);
+Route::resource('materias-primas', MateriaPrimaController::class);
 
 
 Route::middleware('auth')->group(function () {
