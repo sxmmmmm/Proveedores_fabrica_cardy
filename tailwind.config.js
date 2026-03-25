@@ -11,6 +11,14 @@ export default {
 
     theme: {
         extend: {
+    colors: {
+        cardy: {
+            pink: '#F4A7B9',
+            teal: '#4DC9C2',
+        }
+    }
+},
+        extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

@@ -2,7 +2,7 @@
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight">
-            Nuevo Cliente
+            Editar Cliente
         </h2>
     </x-slot>
 
@@ -27,39 +27,40 @@
         @endif
 
         <div class="bg-white rounded-lg shadow-md p-6">
-            <form action="{{ route('clientes.store') }}" method="POST">
+            <form action="{{ route('clientes.update', $cliente) }}" method="POST">
                 @csrf
+                @method('PATCH')
 
                 <div class="grid grid-cols-2 gap-4">
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Nombre</label>
-                        <input type="text" name="nombre" placeholder="Nombre" class="border p-2 w-full">
+                        <input type="text" name="nombre" value="{{ $cliente->nombre }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Documento</label>
-                        <input type="text" name="documento" placeholder="Documento" class="border p-2 w-full">
+                        <input type="text" name="documento" value="{{ $cliente->documento }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Teléfono</label>
-                        <input type="text" name="telefono" placeholder="Teléfono" class="border p-2 w-full">
+                        <input type="text" name="telefono" value="{{ $cliente->telefono }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Correo</label>
-                        <input type="email" name="correo" placeholder="Correo" class="border p-2 w-full">
+                        <input type="email" name="correo" value="{{ $cliente->correo }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Ciudad</label>
-                        <input type="text" name="ciudad" placeholder="Ciudad" class="border p-2 w-full">
+                        <input type="text" name="ciudad" value="{{ $cliente->ciudad }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Dirección</label>
-                        <input type="text" name="direccion" placeholder="Dirección" class="border p-2 w-full">
+                        <input type="text" name="direccion" value="{{ $cliente->direccion }}" class="border p-2 w-full">
                     </div>
 
                 </div>
@@ -67,7 +68,7 @@
                 <div class="mt-6">
                     <button style="background-color: #4DC9C2; color: black"
                         class="w-full py-2 rounded">
-                        Guardar Cliente
+                        Actualizar Cliente
                     </button>
                 </div>
 
