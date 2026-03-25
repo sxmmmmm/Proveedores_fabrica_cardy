@@ -41,4 +41,18 @@ class ProveedorController extends Controller
                          ->with('success', 'Proveedor agregado correctamente');
 
     }
+    public function edit(Proveedor $proveedore)
+    {
+        return view('proveedores.edit', compact('proveedore'));
+    }
+    public function update(Request $request, Proveedor $proveedore)
+    {
+        $proveedore->update($request->all());
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor actualizado Correctamente');
+    }
+    public function destroy(Proveedor $proveedore)
+    {
+        $proveedore->delete();
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor eliminado correctamente');
+    }
 }
