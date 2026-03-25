@@ -2,7 +2,7 @@
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight">
-            Nueva Materia Prima
+            Editar Materia Prima
         </h2>
     </x-slot>
 
@@ -27,42 +27,44 @@
         @endif
 
         <div class="bg-white rounded-lg shadow-md p-6">
-            <form action="{{ route('materias-primas.store') }}" method="POST">
+            <form action="{{ route('materias-primas.update', $materiaPrima) }}" method="POST">
                 @csrf
+                @method('PATCH')
 
                 <div class="grid grid-cols-2 gap-4">
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Nombre</label>
-                        <input type="text" name="nombre" class="border p-2 w-full">
+                        <input type="text" name="nombre" value="{{ $materiaPrima->nombre }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Tipo</label>
-                        <input type="text" name="tipo" class="border p-2 w-full">
+                        <input type="text" name="tipo" value="{{ $materiaPrima->tipo }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Color</label>
-                        <input type="text" name="color" class="border p-2 w-full">
+                        <input type="text" name="color" value="{{ $materiaPrima->color }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Stock</label>
-                        <input type="number" name="stock" class="border p-2 w-full">
+                        <input type="number" name="stock" value="{{ $materiaPrima->stock }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">Precio</label>
-                        <input type="number" step="0.01" name="precio" class="border p-2 w-full">
+                        <input type="number" step="0.01" name="precio" value="{{ $materiaPrima->precio }}" class="border p-2 w-full">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-black mb-1">ID Proveedor</label>
-                        <select name="proveedor_id" class="border p-2 w-full mb-2">
+                        <select name="proveedor_id" class="border p-2 w-full">
                             <option value="">Seleccione un proveedor</option>
                             @foreach($proveedores as $proveedor)
-                                <option value="{{ $proveedor->id }}">
+                                <option value="{{ $proveedor->id }}"
+                                    {{ $materiaPrima->proveedor_id == $proveedor->id ? 'selected' : '' }}>
                                     {{ $proveedor->nombre }}
                                 </option>
                             @endforeach
@@ -74,7 +76,7 @@
                 <div class="mt-6">
                     <button style="background-color: #4DC9C2; color: black"
                         class="w-full py-2 rounded">
-                        Guardar Materia Prima
+                        Actualizar Materia Prima
                     </button>
                 </div>
 

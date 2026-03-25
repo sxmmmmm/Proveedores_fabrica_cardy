@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Proveedor;
 
 class MateriaPrima extends Model
 {
@@ -16,4 +17,9 @@ class MateriaPrima extends Model
         'precio',
         'proveedor_id'
     ];
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class);
+    }
 }

@@ -1,42 +1,39 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
             FABRICA CARDY
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="min-h-screen bg-pink-50 pt-10">
+        <div class="max-w-4xl mx-auto px-6">
 
-                <div class="p-6 text-gray-900">
+            <h3 class="text-lg font-semibold mb-8 text-center text-gray-700">
+                Panel de navegación
+            </h3>
 
-                    <h3 class="text-lg font-bold mb-6 text-center">
-                        Panel de navegación
-                    </h3>
+            <div class="flex justify-center gap-6 flex-wrap">
 
-                    <div class="flex justify-center gap-6 flex-wrap">
+                <a href="{{ route('clientes.index') }}"
+                   class="w-48 bg-blue-500 hover:bg-blue-600 text-white p-5 rounded-xl shadow-md transition text-center">
+                    <h3 class="font-bold text-md">Clientes</h3>
+                    <p class="text-sm opacity-90">Gestionar clientes</p>
+                </a>
 
-                        <a href="{{ route('clientes.index') }}"
-                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow">
-                            Clientes
-                        </a>
+                <a href="{{ route('proveedores.index') }}"
+                   class="w-48 bg-green-500 hover:bg-green-600 text-white p-5 rounded-xl shadow-md transition text-center">
+                    <h3 class="font-bold text-md">Proveedores</h3>
+                    <p class="text-sm opacity-90">Gestionar proveedores</p>
+                </a>
 
-                        <a href="{{ route('proveedores.index') }}"
-                           class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow">
-                            Proveedores
-                        </a>
-
-                        <a href="{{ route('materias-primas.index') }}"
-                           class="bg-red-600 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg shadow">
-                            Materias Primas
-                        </a>
-
-                    </div>
-
-                </div>
+                <a href="{{ route('materias-primas.index') }}"
+                   class="w-48 bg-red-500 hover:bg-red-600 text-white p-5 rounded-xl shadow-md transition text-center">
+                    <h3 class="font-bold text-md">Materias Primas</h3>
+                    <p class="text-sm opacity-90">Control de insumos</p>
+                </a>
 
             </div>
+
         </div>
     </div>
 </x-app-layout>

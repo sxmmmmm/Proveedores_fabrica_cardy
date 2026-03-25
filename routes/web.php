@@ -16,7 +16,8 @@ Route::get('/dashboard', function () {
 
 Route::resource('clientes', ClienteController::class);
 Route::resource('proveedores', ProveedorController::class);
-Route::resource('materias-primas', MateriaPrimaController::class);
+Route::resource('materias-primas', MateriaPrimaController::class)
+    ->parameters(['materias-primas' => 'materiaPrima']);
 
 
 Route::middleware('auth')->group(function () {
