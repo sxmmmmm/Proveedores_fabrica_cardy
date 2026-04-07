@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MateriaPrimaController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProveedorController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +18,8 @@ Route::get('/dashboard', function () {
 
 Route::resource('clientes', ClienteController::class);
 Route::resource('proveedores', ProveedorController::class);
+Route::resource('empleados', EmpleadoController::class);
+Route::resource('productos', ProductoController::class);
 Route::resource('materias-primas', MateriaPrimaController::class)
     ->parameters(['materias-primas' => 'materiaPrima']);
 
