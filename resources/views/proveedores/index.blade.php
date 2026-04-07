@@ -1,9 +1,7 @@
-<x-app-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-teal-500 leading-tight">
-            Proveedores
-        </h2>
+        Proveedores
     </x-slot>
 
     <div class="p-6">
@@ -87,4 +85,4 @@
 
     </div>
 
-</x-app-layout>
+</x-with-sidebar-layout>

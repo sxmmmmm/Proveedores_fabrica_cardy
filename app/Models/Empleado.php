@@ -11,7 +11,9 @@ class Empleado extends Model
         'documento',
         'telefono',
         'correo',
-        'cargo'
+        'cargo',
+        'direccion',
+        'ciudad'
     ];
 
     // Relación con materia prima

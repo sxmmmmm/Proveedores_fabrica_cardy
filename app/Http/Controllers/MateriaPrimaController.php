@@ -10,14 +10,13 @@ class MateriaPrimaController extends Controller
 {
     public function index()
     {
-        $materias = MateriaPrima::with('proveedor')->get();
+        $materias = MateriaPrima::all();
         return view('materias_primas.index', compact('materias'));
     }
 
     public function create()
     {
-        $proveedores = Proveedor::all();
-        return view('materias_primas.create', compact('proveedores'));
+        return view('materias_primas.create');
     }
 
     public function store(Request $request)
@@ -27,11 +26,10 @@ class MateriaPrimaController extends Controller
             'tipo' => 'required|string|max:100',
             'color' => 'nullable|string|max:100',
             'stock' => 'required|integer',
-            'precio' => 'required|numeric',
-            'proveedor_id' => 'nullable|integer|exists:proveedores,id'
+            'precio' => 'required|numeric'
         ]);
 
-        MateriaPrima::create($request->all());
+        MateriaPrima::create($request->only(['nombre', 'tipo', 'color', 'stock', 'precio']));
 
         return redirect()->route('materias-primas.index')
                          ->with('success', 'Materia prima creada correctamente');
@@ -39,8 +37,7 @@ class MateriaPrimaController extends Controller
 
     public function edit(MateriaPrima $materiaPrima)
     {
-        $proveedores = Proveedor::all();
-        return view('materias_primas.edit', compact('materiaPrima', 'proveedores'));
+        return view('materias_primas.edit', compact('materiaPrima'));
     }
 
     public function update(Request $request, MateriaPrima $materiaPrima)
@@ -50,11 +47,10 @@ class MateriaPrimaController extends Controller
             'tipo' => 'required|string|max:100',
             'color' => 'nullable|string|max:100',
             'stock' => 'required|integer',
-            'precio' => 'required|numeric',
-            'proveedor_id' => 'nullable|integer|exists:proveedores,id'
+            'precio' => 'required|numeric'
         ]);
 
-        $materiaPrima->update($request->all());
+        $materiaPrima->update($request->only(['nombre', 'tipo', 'color', 'stock', 'precio']));
 
         return redirect()->route('materias-primas.index')
                          ->with('success', 'Materia prima actualizada correctamente');

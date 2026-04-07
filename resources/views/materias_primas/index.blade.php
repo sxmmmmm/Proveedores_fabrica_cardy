@@ -1,9 +1,7 @@
-<x-app-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-teal-500 leading-tight">
-            Materias Primas
-        </h2>
+        Materias Primas
     </x-slot>
 
     <div class="p-6">
@@ -33,7 +31,6 @@
                         <th class="p-3 border">Color</th>
                         <th class="p-3 border">Stock</th>
                         <th class="p-3 border">Precio</th>
-                        <th class="p-3 border">Proveedor ID</th>
                         <th class="p-3 border">Acciones</th>
                     </tr>
                 </thead>
@@ -48,7 +45,6 @@
                             <td class="p-3 border">{{ $m->color }}</td>
                             <td class="p-3 border">{{ $m->stock }}</td>
                             <td class="p-3 border">{{ $m->precio }}</td>
-                            <td class="p-3 border">{{ $m->proveedor->nombre ?? 'Sin proveedor' }}</td>
 
                             <td class="p-3 border">
                                 <div class="flex gap-2 justify-center">
@@ -74,7 +70,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="p-4 text-gray-500">
+                            <td colspan="6" class="p-4 text-gray-500">
                                 No hay materias primas
                             </td>
                         </tr>
@@ -87,4 +83,4 @@
 
     </div>
 
-</x-app-layout>
+</x-with-sidebar-layout>

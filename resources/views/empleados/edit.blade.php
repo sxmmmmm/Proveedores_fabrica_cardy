@@ -1,66 +1,103 @@
-<x-app-layout>
-
+<x-with-sidebar-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight">
-            Editar Empleado
-        </h2>
+        Editar Empleado
     </x-slot>
 
-    <div class="p-6 max-w-3xl mx-auto">
-
+    <div>
         <div class="mb-6">
-            <a href="{{ route('empleados.index') }}" class="text-gray-500 hover:text-gray-700">
-                ← Volver
+            <a href="{{ route('empleados.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Volver a Empleados
             </a>
         </div>
 
         @if($errors->any())
-            <div class="bg-red-100 text-red-800 p-3 mb-4">
-                @foreach($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                <h4 class="font-semibold mb-2">Errores en el formulario:</h4>
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
-        <form action="{{ route('empleados.update', $empleado) }}" method="POST">
-            @csrf
-            @method('PUT')
+        <div class="bg-white rounded-lg shadow p-6 max-w-2xl">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Editar Empleado</h2>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-    <label class="block mb-1">Documento</label>
-    <input type="text" name="documento" value="{{ $empleado->documento }}" class="border p-2 w-full">
-</div>
-                <div>
-                    <label class="block mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ $empleado->nombre }}" class="border p-2 w-full">
+            <form action="{{ route('empleados.update', $empleado) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Documento *</label>
+                        <input type="text" name="documento" value="{{ old('documento', $empleado->documento) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        @error('documento')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo *</label>
+                        <input type="text" name="nombre" value="{{ old('nombre', $empleado->nombre) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        @error('nombre')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
+                        <input type="tel" name="telefono" value="{{ old('telefono', $empleado->telefono) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('telefono')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
+                        <input type="email" name="correo" value="{{ old('correo', $empleado->correo) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('correo')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Cargo</label>
+                        <input type="text" name="cargo" value="{{ old('cargo', $empleado->cargo) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ej: Operario, Supervisor...">
+                        @error('cargo')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Ciudad</label>
+                        <input type="text" name="ciudad" value="{{ old('ciudad', $empleado->ciudad) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('ciudad')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección</label>
+                        <input type="text" name="direccion" value="{{ old('direccion', $empleado->direccion) }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('direccion')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block mb-1">Teléfono</label>
-                    <input type="text" name="telefono" value="{{ $empleado->telefono }}" class="border p-2 w-full">
+                <div class="mt-8 flex gap-4">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Actualizar Empleado
+                    </button>
+                    <a href="{{ route('empleados.index') }}" class="flex-1 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-400 transition">
+                        Cancelar
+                    </a>
                 </div>
-
-                <div>
-                    <label class="block mb-1">Correo</label>
-                    <input type="email" name="correo" value="{{ $empleado->correo }}" class="border p-2 w-full">
-                </div>
-
-                <div>
-                    <label class="block mb-1">Cargo</label>
-                    <input type="text" name="cargo" value="{{ $empleado->cargo }}" class="border p-2 w-full">
-                </div>
-
-            </div>
-
-            <div class="mt-6">
-                <button class="w-full bg-blue-500 text-white py-2 rounded">
-                    Actualizar
-                </button>
-            </div>
-
-        </form>
-
+            </form>
+        </div>
     </div>
-
-</x-app-layout>
+</x-with-sidebar-layout>

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -45,5 +46,46 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasRole($role): bool
+    {
+        if (is_string($role)) {
+            return $this->role && $this->role->name === $role;
+        }
+        return $this->role_id === $role->id;
+    }
+
+    public function hasPermission($permission): bool
+    {
+        if (!$this->role) {
+            return false;
+        }
+        return $this->role->hasPermission($permission);
+    }
+
+    public function hasAnyRole($roles): bool
+    {
+        return collect($roles)->contains(fn($role) => $this->hasRole($role));
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isManager(): bool
+    {
+        return $this->hasRole('manager');
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->hasRole('employee');
     }
 }
