@@ -22,10 +22,12 @@ class EmpleadoController extends Controller
     {
 $request->validate([
     'nombre' => 'required|string|max:255',
-    'documento' => 'required|string|max:50',
+    'documento' => 'required|string|max:50|unique:empleados,documento',
     'telefono' => 'nullable|string|max:50',
-    'correo' => 'nullable|email',
+    'correo' => 'nullable|email|unique:empleados,correo',
     'cargo' => 'nullable|string|max:100',
+    'ciudad' => 'nullable|string|max:100',
+    'direccion' => 'nullable|string|max:255',
 ]);
 
         Empleado::create($request->all());
@@ -43,10 +45,12 @@ $request->validate([
     {
 $request->validate([
     'nombre' => 'required|string|max:255',
-    'documento' => 'required|string|max:50',
+    'documento' => 'required|string|max:50|unique:empleados,documento,'.$empleado->id,
     'telefono' => 'nullable|string|max:50',
-    'correo' => 'nullable|email',
+    'correo' => 'nullable|email|unique:empleados,correo,'.$empleado->id,
     'cargo' => 'nullable|string|max:100',
+    'ciudad' => 'nullable|string|max:100',
+    'direccion' => 'nullable|string|max:255',
 ]);
 
         $empleado->update($request->all());

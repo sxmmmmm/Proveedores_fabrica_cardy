@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight">

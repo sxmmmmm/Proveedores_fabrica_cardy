@@ -1,9 +1,7 @@
-<x-app-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight">
-            Nuevo Producto
-        </h2>
+        Nuevo Producto
     </x-slot>
 
     <div class="p-6 max-w-3xl mx-auto">
@@ -59,4 +57,4 @@
 
     </div>
 
-</x-app-layout>
+</x-with-sidebar-layout>

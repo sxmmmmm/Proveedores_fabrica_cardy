@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl leading-tight">
@@ -57,18 +57,6 @@
                         <input type="number" step="0.01" name="precio" class="border p-2 w-full">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-black mb-1">ID Proveedor</label>
-                        <select name="proveedor_id" class="border p-2 w-full mb-2">
-                            <option value="">Seleccione un proveedor</option>
-                            @foreach($proveedores as $proveedor)
-                                <option value="{{ $proveedor->id }}">
-                                    {{ $proveedor->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
                 </div>
 
                 <div class="mt-6">
@@ -83,4 +71,4 @@
 
     </div>
 
-</x-app-layout>
+</x-with-sidebar-layout>
