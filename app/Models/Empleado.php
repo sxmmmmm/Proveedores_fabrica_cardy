@@ -17,7 +17,7 @@ class Empleado extends Model
     ];
 
     // Relación con materia prima
-    public function materias()
+    public function materiasPrimas()
     {
         return $this->hasMany(MateriaPrima::class);
     }

@@ -17,6 +17,6 @@ class Producto extends Model
     // Relación con materia prima
     public function materiaPrima()
     {
-        return $this->belongsTo(MateriaPrima::class);
+        return $this->belongsTo(MateriaPrima::class, 'materia_prima_id');
     }
 }
