@@ -58,6 +58,19 @@
                         <input type="number" step="0.01" name="precio" value="{{ $materiaPrima->precio }}" class="border p-2 w-full">
                     </div>
 
+                    <!-- ✅ EMPLEADO -->
+                    <div>
+<label for="empleado_id">Empleado</label>
+<select name="empleado_id" id="empleado_id" required>
+    <option value="">Seleccione un empleado</option>
+    @foreach ($empleados as $empleado)
+        <option value="{{ $empleado->id }}">
+            {{ $empleado->nombre }}
+        </option>
+    @endforeach
+</select>
+                    </div>
+
                 </div>
 
                 <div class="mt-6">

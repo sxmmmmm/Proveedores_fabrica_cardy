@@ -31,6 +31,7 @@
                         <th class="p-3 border">Color</th>
                         <th class="p-3 border">Stock</th>
                         <th class="p-3 border">Precio</th>
+                        <th class="p-3 border">Empleado</th> <!-- ✅ NUEVO -->
                         <th class="p-3 border">Acciones</th>
                     </tr>
                 </thead>
@@ -45,6 +46,11 @@
                             <td class="p-3 border">{{ $m->color }}</td>
                             <td class="p-3 border">{{ $m->stock }}</td>
                             <td class="p-3 border">{{ $m->precio }}</td>
+
+                            <!-- ✅ EMPLEADO -->
+                            <td class="p-3 border">
+                                {{ $m->empleado->nombre ?? 'Sin asignar' }}
+                            </td>
 
                             <td class="p-3 border">
                                 <div class="flex gap-2 justify-center">
@@ -70,7 +76,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-4 text-gray-500">
+                            <td colspan="7" class="p-4 text-gray-500">
                                 No hay materias primas
                             </td>
                         </tr>

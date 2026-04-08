@@ -6,7 +6,7 @@
     <div class="min-h-full" style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);">
         <!-- Header Welcome -->
         <div class="mb-8">
-            <h2 class="text-4xl font-bold text-gray-900">¡Bienvenido a Cardy! 👠</h2>
+            <h2 class="text-4xl font-bold text-gray-900">¡Bienvenido a Cardy!</h2>
             <p class="text-gray-600 mt-2 text-lg">Panel de control de la fábrica de zapatos</p>
         </div>
 

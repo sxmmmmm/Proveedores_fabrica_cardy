@@ -43,9 +43,9 @@
                             <td class="p-3 border">{{ $producto->stock }}</td>
                             <td class="p-3 border">{{ $producto->precio }}</td>
 
-                            <!-- 👇 AQUÍ MUESTRA EL NOMBRE EN VEZ DEL ID -->
+                            <!-- ✅ RELACIÓN SEGURA -->
                             <td class="p-3 border">
-                                {{ $producto->materiaPrima->nombre ?? 'Sin materia prima' }}
+                                {{ optional($producto->materiaPrima)->nombre ?? 'Sin materia prima' }}
                             </td>
 
                             <td class="p-3 border">
