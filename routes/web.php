@@ -10,6 +10,12 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\RoleManagementController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes - Proyecto Cardy
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -38,6 +44,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/roles/management', [RoleManagementController::class, 'index'])->name('roles.management');
     Route::post('/roles/{user}/update', [RoleManagementController::class, 'updateRole'])->name('roles.update');
 
+
+    // --- RUTAS DE EXPORTACIÓN (Reportes) ---
+    Route::prefix('export')->name('export.')->group(function () {
+        Route::get('/complete', [ExportController::class, 'exportComplete'])->name('complete');
+        Route::get('/empleados', [ExportController::class, 'exportEmpleados'])->name('empleados');
+        Route::get('/productos', [ExportController::class, 'exportProductos'])->name('productos');
+        Route::get('/materias-primas', [ExportController::class, 'exportMateriasPrimas'])->name('materias_primas');
+        Route::get('/proveedores', [ExportController::class, 'exportProveedores'])->name('proveedores');
+        Route::get('/clientes', [ExportController::class, 'exportClientes'])->name('clientes');
+    });
+
+
+    // --- PERFIL DE USUARIO ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
