@@ -1,4 +1,4 @@
-<x-with-sidebar-layout>
+﻿<x-with-sidebar-layout>
 
     <x-slot name="header">
         Productos
@@ -6,13 +6,19 @@
 
     <div class="p-6">
 
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-4">
             <a href="{{ route('productos.create') }}"
                style="background-color: #4DC9C2; color: black"
                class="px-4 py-2 rounded">
                 Nuevo Producto
             </a>
         </div>
+        <x-import-export-bar
+            :importRoute="route('productos.import')"
+            :exportExcel="route('productos.export.excel')"
+            :exportCsv="route('productos.export.csv')"
+            :exportPdf="route('productos.export.pdf')"
+        />
 
         @if(session('success'))
             <div class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4">
@@ -43,7 +49,7 @@
                             <td class="p-3 border">{{ $producto->stock }}</td>
                             <td class="p-3 border">{{ $producto->precio }}</td>
 
-                            <!-- ✅ RELACIÓN SEGURA -->
+                            <!-- âœ… RELACIÃ“N SEGURA -->
                             <td class="p-3 border">
                                 {{ optional($producto->materiaPrima)->nombre ?? 'Sin materia prima' }}
                             </td>

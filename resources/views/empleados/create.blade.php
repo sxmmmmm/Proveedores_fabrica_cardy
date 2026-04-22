@@ -5,7 +5,7 @@
 
     <div>
         <div class="mb-6">
-            <a href="{{ route('empleados.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <a href="{{ route('empleados.index') }}" class="inline-flex items-center" style="color: #4DC9C2;">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
@@ -33,7 +33,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Documento *</label>
-                        <input type="text" name="documento" value="{{ old('documento') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <input type="text" name="documento" value="{{ old('documento') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent" style="focus-ring-color: #4DC9C2;" required>
                         @error('documento')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -41,7 +41,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo *</label>
-                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
                         @error('nombre')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -49,7 +49,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
-                        <input type="tel" name="telefono" value="{{ old('telefono') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="tel" name="telefono" value="{{ old('telefono') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         @error('telefono')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -57,7 +57,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
-                        <input type="email" name="correo" value="{{ old('correo') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="email" name="correo" value="{{ old('correo') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         @error('correo')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -65,7 +65,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Cargo</label>
-                        <input type="text" name="cargo" value="{{ old('cargo') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ej: Operario, Supervisor...">
+                        <input type="text" name="cargo" value="{{ old('cargo') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Ej: Operario, Supervisor...">
                         @error('cargo')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -73,7 +73,7 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Ciudad</label>
-                        <input type="text" name="ciudad" value="{{ old('ciudad') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="text" name="ciudad" value="{{ old('ciudad') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         @error('ciudad')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -81,7 +81,7 @@
 
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección</label>
-                        <input type="text" name="direccion" value="{{ old('direccion') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="text" name="direccion" value="{{ old('direccion') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
                         @error('direccion')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="mt-8 flex gap-4">
-                    <button type="submit" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    <button type="submit" class="flex-1 text-white px-6 py-3 rounded-lg font-semibold transition" style="background-color: #4DC9C2;">
                         Guardar Empleado
                     </button>
                     <a href="{{ route('empleados.index') }}" class="flex-1 bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-semibold text-center hover:bg-gray-400 transition">

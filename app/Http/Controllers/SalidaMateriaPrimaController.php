@@ -1,22 +1,21 @@
 <?php
 namespace App\Http\Controllers;
-
-use App\Models\EntradaMateriaPrima;
+use App\Models\SalidaMateriaPrima;
 use App\Models\MateriaPrima;
 use Illuminate\Http\Request;
 
-class EntradaMateriaPrimaController extends Controller
+class SalidaMateriaPrimaController extends Controller
 {
     public function index()
     {
-        $entradas = EntradaMateriaPrima::with('materiaPrima')->latest()->paginate(10);
-        return view('entradas_materia_prima.index', compact('entradas'));
+        $salidas = SalidaMateriaPrima::with('materiaPrima')->latest()->paginate(10);
+        return view('salidas_materia_prima.index', compact('salidas'));
     }
 
     public function create()
     {
         $materiasPrimas = MateriaPrima::orderBy('nombre')->get();
-        return view('entradas_materia_prima.create', compact('materiasPrimas'));
+        return view('salidas_materia_prima.create', compact('materiasPrimas'));
     }
 
     public function store(Request $request)
@@ -28,14 +27,15 @@ class EntradaMateriaPrimaController extends Controller
             'usuario_nombre'   => 'required|string|max:100',
             'observacion'      => 'nullable|string',
         ]);
-
-        // Sumar stock
         $materia = MateriaPrima::findOrFail($request->materia_prima_id);
-        $materia->increment('stock', $request->cantidad);
-
-        EntradaMateriaPrima::create($request->all());
-
-        return redirect()->route('entradas-materia-prima.index')
-                         ->with('success', 'Entrada registrada correctamente.');
+        if ($request->cantidad > $materia->stock) {
+            return back()->withErrors([
+                'cantidad' => "Stock insuficiente. Disponible: {$materia->stock}"
+            ])->withInput();
+        }
+        $materia->decrement('stock', $request->cantidad);
+        SalidaMateriaPrima::create($request->all());
+        return redirect()->route('salidas-materia-prima.index')
+                         ->with('success', 'Salida registrada correctamente.');
     }
 }

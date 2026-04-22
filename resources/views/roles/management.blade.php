@@ -1,7 +1,7 @@
-@extends('layouts.with-sidebar')
+﻿@extends('layouts.with-sidebar')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="min-h-full container mx-auto px-4 py-6" style="background: linear-gradient(135deg, #fdf2f4 0%, #fce7eb 100%);">
     <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold text-gray-800">Usuarios Registrados en Cardy</h3>
         <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Panel Administrativo</span>
@@ -42,7 +42,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             {{-- Ajustamos la ruta a 'users.update' para que coincida con web.php --}}
-                            <form action="{{ route('users.update', $user->id) }}" method="POST" class="flex items-center">
+                            <form action="{{ route('roles.update', $user->id) }}" method="POST" class="flex items-center">
                                 @csrf
                                 <select name="role_id" onchange="this.form.submit()" 
                                     class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-sm">
@@ -60,7 +60,7 @@
             </table>
         </div>
         
-        {{-- Paginación con estilo Tailwind --}}
+        {{-- PaginaciÃ³n con estilo Tailwind --}}
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
             @if($users instanceof \Illuminate\Pagination\LengthAwarePaginator)
                 {{ $users->links() }}

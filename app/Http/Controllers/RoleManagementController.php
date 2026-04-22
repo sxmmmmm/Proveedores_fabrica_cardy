@@ -72,13 +72,13 @@ class RoleManagementController extends Controller
 
         // Evitar que el administrador actual se cambie el rol a sí mismo 
         if (auth()->id() === $user->id && $request->role_id != $user->role_id) {
-            return redirect()->route('users.index')
+            return redirect()->route('roles.management')
                 ->with('error', 'No puedes cambiar tu propio rol de administrador.');
         }
 
         $user->update(['role_id' => $request->role_id]);
 
-        return redirect()->route('users.index')
+        return redirect()->route('roles.management')
             ->with('success', 'Rol del usuario "' . $user->name . '" actualizado correctamente.');
     }
 }
