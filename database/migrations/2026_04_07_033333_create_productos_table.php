@@ -9,17 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up()
-{
-    Schema::create('productos', function (Blueprint $table) {
-        $table->id();
-        $table->string('nombre');
-        $table->decimal('precio', 10, 2);
-        $table->integer('stock');
-        $table->foreignId('materia_prima_id')->constrained('materias_primas');
-        $table->timestamps();
-    });
-}
+    public function up()
+    {
+        Schema::create('productos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->decimal('precio', 10, 2);
+            $table->integer('stock');
+
+            // ✅ CORREGIDO
+            $table->foreignId('materia_prima_id')
+                  ->constrained('materia_primas');
+
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

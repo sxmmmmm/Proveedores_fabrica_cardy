@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Proveedor;
 
 class MateriaPrima extends Model
 {
+    use HasFactory;
+
     protected $table = 'materia_primas';
 
     protected $fillable = [
@@ -15,11 +17,11 @@ class MateriaPrima extends Model
         'color',
         'stock',
         'precio',
-        'proveedor_id'
+        'empleado_id'
     ];
 
-    public function proveedor()
+    public function empleado()
     {
-        return $this->belongsTo(Proveedor::class);
+        return $this->belongsTo(Empleado::class, 'empleado_id', 'id');
     }
 }

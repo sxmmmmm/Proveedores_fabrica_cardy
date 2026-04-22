@@ -10,27 +10,32 @@ class ProductoController extends Controller
 {
     public function index()
     {
+        // Cargar relación correctamente
         $productos = Producto::with('materiaPrima')->get();
+
         return view('productos.index', compact('productos'));
     }
 
     public function create()
     {
         $materias = MateriaPrima::all();
+
         return view('productos.create', compact('materias'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required',
-            'descripcion' => 'nullable',
-            'precio' => 'required|numeric',
-            'stock' => 'required|integer',
-            'materia_prima_id' => 'required|exists:materias_primas,id'
+        // Validación
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'precio' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'materia_prima_id' => 'required|exists:materia_primas,id'
         ]);
 
-        Producto::create($request->all());
+        // Crear producto
+        Producto::create($data);
 
         return redirect()->route('productos.index')
             ->with('success', 'Producto creado correctamente');
@@ -39,20 +44,21 @@ class ProductoController extends Controller
     public function edit(Producto $producto)
     {
         $materias = MateriaPrima::all();
+
         return view('productos.edit', compact('producto', 'materias'));
     }
 
     public function update(Request $request, Producto $producto)
     {
-        $request->validate([
-            'nombre' => 'required',
-            'descripcion' => 'nullable',
-            'precio' => 'required|numeric',
-            'stock' => 'required|integer',
-            'materia_prima_id' => 'required|exists:materias_primas,id'
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'precio' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'materia_prima_id' => 'required|exists:materia_primas,id'
         ]);
 
-        $producto->update($request->all());
+        $producto->update($data);
 
         return redirect()->route('productos.index')
             ->with('success', 'Producto actualizado correctamente');

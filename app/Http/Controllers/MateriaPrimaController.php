@@ -2,65 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MateriaPrima;
-use App\Models\Proveedor;
 use Illuminate\Http\Request;
+use App\Models\MateriaPrima;
+use App\Models\Empleado;
 
 class MateriaPrimaController extends Controller
 {
     public function index()
     {
-        $materias = MateriaPrima::all();
+        $materias = MateriaPrima::with('empleado')->get();
         return view('materias_primas.index', compact('materias'));
     }
 
     public function create()
     {
-        return view('materias_primas.create');
+        $empleados = \App\Models\Empleado::all();
+        return view('materias_primas.create', compact('empleados'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'tipo' => 'required|string|max:100',
-            'color' => 'nullable|string|max:100',
-            'stock' => 'required|integer',
-            'precio' => 'required|numeric'
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'nombre' => 'required',
+        'tipo' => 'required',
+        'color' => 'required',
+        'stock' => 'required|numeric',
+        'precio' => 'required|numeric',
+        'empleado_id' => 'required|exists:empleados,id',
+    ]);
 
-        MateriaPrima::create($request->only(['nombre', 'tipo', 'color', 'stock', 'precio']));
+    MateriaPrima::create([
+        'nombre' => $request->nombre,
+        'tipo' => $request->tipo,
+        'color' => $request->color,
+        'stock' => $request->stock,
+        'precio' => $request->precio,
+        'empleado_id' => $request->empleado_id,
+    ]);
 
-        return redirect()->route('materias-primas.index')
-                         ->with('success', 'Materia prima creada correctamente');
-    }
+    return redirect()->route('materias-primas.index')
+        ->with('success', 'Materia prima creada correctamente');
+}
 
     public function edit(MateriaPrima $materiaPrima)
     {
-        return view('materias_primas.edit', compact('materiaPrima'));
+        $empleados = \App\Models\Empleado::all();
+        return view('materias-primas.edit', compact('materiaPrima', 'empleados'));
     }
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nombre' => 'required',
+        'tipo' => 'required',
+        'color' => 'required',
+        'stock' => 'required|numeric',
+        'precio' => 'required|numeric',
+        'empleado_id' => 'required|exists:empleados,id',
+    ]);
 
-    public function update(Request $request, MateriaPrima $materiaPrima)
+    $materia = MateriaPrima::findOrFail($id);
+
+    $materia->update([
+        'nombre' => $request->nombre,
+        'tipo' => $request->tipo,
+        'color' => $request->color,
+        'stock' => $request->stock,
+        'precio' => $request->precio,
+        'empleado_id' => $request->empleado_id,
+    ]);
+
+    return redirect()->route('materias-primas.index')
+        ->with('success', 'Materia prima actualizada correctamente');
+}
+
+    public function destroy($id)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'tipo' => 'required|string|max:100',
-            'color' => 'nullable|string|max:100',
-            'stock' => 'required|integer',
-            'precio' => 'required|numeric'
-        ]);
-
-        $materiaPrima->update($request->only(['nombre', 'tipo', 'color', 'stock', 'precio']));
-
-        return redirect()->route('materias-primas.index')
-                         ->with('success', 'Materia prima actualizada correctamente');
-    }
-
-    public function destroy(MateriaPrima $materiaPrima)
-    {
-        $materiaPrima->delete();
-
-        return redirect()->route('materias-primas.index')
-                         ->with('success', 'Materia prima eliminada correctamente');
+        MateriaPrima::destroy($id);
+        return redirect()->route('materia_primas.index');
     }
 }

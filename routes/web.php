@@ -17,38 +17,32 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Todas las rutas dentro de este grupo requieren estar logueado
 Route::middleware('auth')->group(function () {
-    
-    // --- GESTIÓN DE USUARIOS (Solo Administrador) ---
-    
-    // Lista de usuarios (con doble nombre para evitar errores de Sidebar/Botones)
-    Route::get('/usuarios/gestion', [RoleManagementController::class, 'index'])->name('roles.management');
-    Route::get('/usuarios/lista', [RoleManagementController::class, 'index'])->name('users.index');
 
-    // Formulario de creación de nuevo usuario
-    Route::get('/usuarios/crear', [RoleManagementController::class, 'create'])->name('users.create');
-    Route::post('/usuarios/guardar', [RoleManagementController::class, 'store'])->name('users.store');
-
-    // Actualización de roles
-    Route::post('/usuarios/gestion/{user}', [RoleManagementController::class, 'updateRole'])->name('roles.update');
-    Route::post('/usuarios/gestion-update/{user}', [RoleManagementController::class, 'updateRole'])->name('users.update');
-
-
-    // --- RECURSOS DEL SISTEMA ---
     Route::resource('clientes', ClienteController::class);
     Route::resource('proveedores', ProveedorController::class);
     Route::resource('empleados', EmpleadoController::class);
     Route::resource('productos', ProductoController::class);
+
     Route::resource('materias-primas', MateriaPrimaController::class)
         ->parameters(['materias-primas' => 'materiaPrima']);
+
+    Route::get('/export/complete', [ExportController::class, 'exportComplete'])->name('export.complete');
+    Route::get('/export/empleados', [ExportController::class, 'exportEmpleados'])->name('export.empleados');
+    Route::get('/export/productos', [ExportController::class, 'exportProductos'])->name('export.productos');
+    Route::get('/export/materias-primas', [ExportController::class, 'exportMateriasPrimas'])->name('export.materias_primas');
+    Route::get('/export/proveedores', [ExportController::class, 'exportProveedores'])->name('export.proveedores');
+    Route::get('/export/clientes', [ExportController::class, 'exportClientes'])->name('export.clientes');
+
+    Route::get('/roles/management', [RoleManagementController::class, 'index'])->name('roles.management');
+    Route::post('/roles/{user}/update', [RoleManagementController::class, 'updateRole'])->name('roles.update');
 
 
     // --- RUTAS DE EXPORTACIÓN (Reportes) ---
@@ -66,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 });
 
 require __DIR__.'/auth.php';

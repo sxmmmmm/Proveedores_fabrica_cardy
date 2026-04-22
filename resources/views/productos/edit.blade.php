@@ -28,22 +28,33 @@
 
                 <div>
                     <label class="block mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ $producto->nombre }}" class="border p-2 w-full">
+                    <input type="text" name="nombre" value="{{ old('nombre', $producto->nombre) }}" class="border p-2 w-full" required>
                 </div>
 
                 <div>
                     <label class="block mb-1">Stock</label>
-                    <input type="number" name="stock" value="{{ $producto->stock }}" class="border p-2 w-full">
+                    <input type="number" name="stock" value="{{ old('stock', $producto->stock) }}" class="border p-2 w-full" required>
                 </div>
 
                 <div>
                     <label class="block mb-1">Precio</label>
-                    <input type="number" step="0.01" name="precio" value="{{ $producto->precio }}" class="border p-2 w-full">
+                    <input type="number" step="0.01" name="precio" value="{{ old('precio', $producto->precio) }}" class="border p-2 w-full" required>
                 </div>
 
+                <!-- SELECT -->
                 <div>
-                    <label class="block mb-1">Materia Prima ID</label>
-                    <input type="number" name="materia_prima_id" value="{{ $producto->materia_prima_id }}" class="border p-2 w-full">
+                    <label class="block mb-1">Materia Prima</label>
+                    <select name="materia_prima_id" class="border p-2 w-full" required>
+                        <option value="">Seleccione una materia prima</option>
+
+                        @foreach($materias as $materia)
+                            <option value="{{ $materia->id }}"
+                                {{ old('materia_prima_id', $producto->materia_prima_id) == $materia->id ? 'selected' : '' }}>
+                                {{ $materia->nombre }}
+                            </option>
+                        @endforeach
+
+                    </select>
                 </div>
 
             </div>
