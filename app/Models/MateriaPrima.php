@@ -7,7 +7,7 @@ use App\Models\Proveedor;
 
 class MateriaPrima extends Model
 {
-    protected $table = 'materias_primas';
+    protected $table = 'materia_primas';
 
     protected $fillable = [
         'nombre',

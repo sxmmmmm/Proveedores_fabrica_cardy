@@ -10,6 +10,12 @@ use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\RoleManagementController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes - Proyecto Cardy
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -18,31 +24,48 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::resource('clientes', ClienteController::class);
-Route::resource('proveedores', ProveedorController::class);
-Route::resource('empleados', EmpleadoController::class);
-Route::resource('productos', ProductoController::class);
-Route::resource('materias-primas', MateriaPrimaController::class)
-    ->parameters(['materias-primas' => 'materiaPrima']);
-
-// Export routes
+// Todas las rutas dentro de este grupo requieren estar logueado
 Route::middleware('auth')->group(function () {
-    Route::get('/export/complete', [ExportController::class, 'exportComplete'])->name('export.complete');
-    Route::get('/export/empleados', [ExportController::class, 'exportEmpleados'])->name('export.empleados');
-    Route::get('/export/productos', [ExportController::class, 'exportProductos'])->name('export.productos');
-    Route::get('/export/materias-primas', [ExportController::class, 'exportMateriasPrimas'])->name('export.materias_primas');
-    Route::get('/export/proveedores', [ExportController::class, 'exportProveedores'])->name('export.proveedores');
-    Route::get('/export/clientes', [ExportController::class, 'exportClientes'])->name('export.clientes');
+    
+    // --- GESTIÓN DE USUARIOS (Solo Administrador) ---
+    
+    // Lista de usuarios (con doble nombre para evitar errores de Sidebar/Botones)
+    Route::get('/usuarios/gestion', [RoleManagementController::class, 'index'])->name('roles.management');
+    Route::get('/usuarios/lista', [RoleManagementController::class, 'index'])->name('users.index');
 
-    // Role management routes
-    Route::get('/roles/management', [RoleManagementController::class, 'index'])->name('roles.management');
-    Route::post('/roles/{user}/update', [RoleManagementController::class, 'updateRole'])->name('roles.update');
+    // Formulario de creación de nuevo usuario
+    Route::get('/usuarios/crear', [RoleManagementController::class, 'create'])->name('users.create');
+    Route::post('/usuarios/guardar', [RoleManagementController::class, 'store'])->name('users.store');
 
+    // Actualización de roles
+    Route::post('/usuarios/gestion/{user}', [RoleManagementController::class, 'updateRole'])->name('roles.update');
+    Route::post('/usuarios/gestion-update/{user}', [RoleManagementController::class, 'updateRole'])->name('users.update');
+
+
+    // --- RECURSOS DEL SISTEMA ---
+    Route::resource('clientes', ClienteController::class);
+    Route::resource('proveedores', ProveedorController::class);
+    Route::resource('empleados', EmpleadoController::class);
+    Route::resource('productos', ProductoController::class);
+    Route::resource('materias-primas', MateriaPrimaController::class)
+        ->parameters(['materias-primas' => 'materiaPrima']);
+
+
+    // --- RUTAS DE EXPORTACIÓN (Reportes) ---
+    Route::prefix('export')->name('export.')->group(function () {
+        Route::get('/complete', [ExportController::class, 'exportComplete'])->name('complete');
+        Route::get('/empleados', [ExportController::class, 'exportEmpleados'])->name('empleados');
+        Route::get('/productos', [ExportController::class, 'exportProductos'])->name('productos');
+        Route::get('/materias-primas', [ExportController::class, 'exportMateriasPrimas'])->name('materias_primas');
+        Route::get('/proveedores', [ExportController::class, 'exportProveedores'])->name('proveedores');
+        Route::get('/clientes', [ExportController::class, 'exportClientes'])->name('clientes');
+    });
+
+
+    // --- PERFIL DE USUARIO ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::resource('proveedores', ProveedorController::class);
 });
 
 require __DIR__.'/auth.php';
