@@ -1,85 +1,123 @@
 ﻿<x-with-sidebar-layout>
-    <x-slot name="header">
-        Empleados
-    </x-slot>
 
-    <div>
-        <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-gray-900">Gestión de Empleados</h2>
+    <x-slot name="pageTitle">Gestión de Empleados</x-slot>
+    <x-slot name="header">Empleados</x-slot>
+
+    <div class="p-6">
+
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Gestión de Empleados</h2>
+                <p class="text-sm text-gray-500 mt-1">Administra el personal registrado en la fábrica.</p>
+            </div>
             <a href="{{ route('empleados.create') }}"
-               class="inline-flex items-center px-4 py-2 text-white rounded-lg transition"
-               style="background-color: #4DC9C2;">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Nuevo Empleado
+               style="background-color: #4DC9C2; color: black"
+               class="px-4 py-2 rounded font-medium whitespace-nowrap">
+                + Nuevo Empleado
             </a>
         </div>
 
-        @if($empleados->count() > 0)
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Nombre</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Documento</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Cargo</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Teléfono</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Correo</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Ciudad</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        @foreach($empleados as $empleado)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm text-gray-900">{{ $empleado->id }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900">{{ $empleado->nombre }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $empleado->documento }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900">{{ $empleado->cargo ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $empleado->telefono ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $empleado->correo ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $empleado->ciudad ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm space-x-2">
-                                    <a href="{{ route('empleados.edit', $empleado) }}"
-                                       class="inline-flex items-center px-3 py-1 text-white text-xs rounded transition"
-                                       style="background-color: #4DC9C2;">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                        Editar
-                                    </a>
-
-                                    <form action="{{ route('empleados.destroy', $empleado) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este empleado?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="inline-flex items-center px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
+        {{-- Filtros --}}
+        <form method="GET" action="{{ route('empleados.index') }}"
+              class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+            <div class="flex flex-wrap gap-3 items-end">
+                <div class="flex-1 min-w-[180px]">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Buscar</label>
+                    <input type="text" name="search" value="{{ $filters['search'] ?? '' }}"
+                           placeholder="Nombre, documento, correo..."
+                           class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                </div>
+                <div class="min-w-[140px]">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Cargo</label>
+                    <select name="cargo" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <option value="">Todos</option>
+                        @foreach($cargos as $c)
+                            <option value="{{ $c }}" {{ ($filters['cargo'] ?? '') === $c ? 'selected' : '' }}>{{ $c }}</option>
                         @endforeach
-                    </tbody>
-                </table>
+                    </select>
+                </div>
+                <div class="min-w-[140px]">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Ciudad</label>
+                    <select name="ciudad" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        <option value="">Todas</option>
+                        @foreach($ciudades as $c)
+                            <option value="{{ $c }}" {{ ($filters['ciudad'] ?? '') === $c ? 'selected' : '' }}>{{ $c }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" style="background-color: #4DC9C2;"
+                            class="text-white px-4 py-1.5 rounded text-sm font-medium">Filtrar</button>
+                    <a href="{{ route('empleados.index') }}"
+                       class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded text-sm font-medium">Limpiar</a>
+                </div>
             </div>
-        @else
-            <div class="bg-white rounded-lg shadow p-8 text-center">
-                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h4a2 2 0 012 2v4a2 2 0 01-2 2h-4M9 10H5a2 2 0 00-2 2v4a2 2 0 002 2h4m0-12V5a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6"></path>
-                </svg>
-                <p class="text-gray-600">No hay empleados registrados aún</p>
-                <a href="{{ route('empleados.create') }}"
-                   class="mt-4 inline-block px-4 py-2 text-white rounded-lg"
-                   style="background-color: #4DC9C2;">
-                    Crear primer empleado
-                </a>
-            </div>
+        </form>
+
+        <x-import-export-bar
+            :importRoute="route('empleados.import')"
+            :exportExcel="route('empleados.export.excel')"
+            :exportCsv="route('empleados.export.csv')"
+            :exportPdf="route('empleados.export.pdf')"
+            :filters="$filters"
+        />
+
+        @if(session('success'))
+            <div class="bg-green-100 text-green-800 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
         @endif
+
+        <div class="text-xs text-gray-500 mb-2">
+            Mostrando {{ $empleados->firstItem() ?? 0 }}–{{ $empleados->lastItem() ?? 0 }} de {{ $empleados->total() }} registros
+        </div>
+
+        <div class="bg-white shadow rounded overflow-x-auto">
+            <table style="border-color: #F4A7B9;" class="w-full text-center border border-gray-300 text-sm">
+                <thead>
+                    <tr style="background-color: #F4A7B9;">
+                        <th class="px-3 py-2 border text-white font-semibold">Nombre</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Documento</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Cargo</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Teléfono</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Correo</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Ciudad</th>
+                        <th class="px-3 py-2 border text-white font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($empleados as $empleado)
+                        <tr onmouseover="this.style.backgroundColor='#FCE4EC'"
+                            onmouseout="this.style.backgroundColor=''">
+                            <td class="px-3 py-2 border">{{ $empleado->nombre }}</td>
+                            <td class="px-3 py-2 border">{{ $empleado->documento }}</td>
+                            <td class="px-3 py-2 border">{{ $empleado->cargo ?? 'N/A' }}</td>
+                            <td class="px-3 py-2 border">{{ $empleado->telefono ?? 'N/A' }}</td>
+                            <td class="px-3 py-2 border">{{ $empleado->correo ?? 'N/A' }}</td>
+                            <td class="px-3 py-2 border">{{ $empleado->ciudad ?? 'N/A' }}</td>
+                            <td class="px-3 py-2 border">
+                                <div class="flex gap-1 justify-center">
+                                    <a href="{{ route('empleados.edit', $empleado) }}"
+                                       style="background-color: #4DC9C2;"
+                                       class="text-white px-2 py-1 rounded text-xs">Editar</a>
+                                    <form action="{{ route('empleados.destroy', $empleado) }}" method="POST"
+                                          onsubmit="return confirm('¿Eliminar este empleado?');">
+                                        @csrf @method('DELETE')
+                                        <button style="background-color: #F4A7B9;"
+                                                class="text-white px-2 py-1 rounded text-xs">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="7" class="p-4 text-gray-500">No hay empleados registrados</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($empleados->hasPages())
+            <div class="mt-4">{{ $empleados->links() }}</div>
+        @endif
+
     </div>
+
 </x-with-sidebar-layout>

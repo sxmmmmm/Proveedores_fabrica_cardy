@@ -7,20 +7,40 @@ use Illuminate\Http\Request;
 
 class ProveedorController extends Controller
 {
-   // Lista todos los proveedores
-    public function index()
+    public function index(Request $request)
     {
-        $proveedores = Proveedor::all();
-        return view('proveedores.index', compact('proveedores'));
+        $query = Proveedor::query();
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('empresa', 'like', "%{$search}%")
+                  ->orWhere('documento', 'like', "%{$search}%")
+                  ->orWhere('correo', 'like', "%{$search}%");
+            });
+        }
+
+        if ($ciudad = $request->input('ciudad')) {
+            $query->where('ciudad', $ciudad);
+        }
+
+        if ($mercancia = $request->input('mercancia')) {
+            $query->where('mercancia', $mercancia);
+        }
+
+        $proveedores = $query->orderBy('nombre')->paginate(15)->withQueryString();
+        $ciudades    = Proveedor::select('ciudad')->whereNotNull('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad');
+        $mercancias  = Proveedor::select('mercancia')->whereNotNull('mercancia')->distinct()->orderBy('mercancia')->pluck('mercancia');
+        $filters     = $request->only(['search', 'ciudad', 'mercancia']);
+
+        return view('proveedores.index', compact('proveedores', 'ciudades', 'mercancias', 'filters'));
     }
 
-    // Muestra el formulario para crear uno nuevo
     public function create()
     {
         return view('proveedores.create');
     }
 
-    // Guarda el nuevo proveedor en la BD
     public function store(Request $request)
     {
         $request->validate([
@@ -37,19 +57,20 @@ class ProveedorController extends Controller
 
         Proveedor::create($request->all());
 
-        return redirect()->route('proveedores.index')
-                         ->with('success', 'Proveedor agregado correctamente');
-
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor agregado correctamente');
     }
+
     public function edit(Proveedor $proveedore)
     {
         return view('proveedores.edit', compact('proveedore'));
     }
+
     public function update(Request $request, Proveedor $proveedore)
     {
         $proveedore->update($request->all());
-        return redirect()->route('proveedores.index')->with('success', 'Proveedor actualizado Correctamente');
+        return redirect()->route('proveedores.index')->with('success', 'Proveedor actualizado correctamente');
     }
+
     public function destroy(Proveedor $proveedore)
     {
         $proveedore->delete();

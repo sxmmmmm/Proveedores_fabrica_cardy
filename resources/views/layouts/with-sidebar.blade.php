@@ -4,27 +4,32 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'Cardy') }} - {{ $header ?? 'Dashboard' }}</title>
+        <title>{{ config('app.name', 'Cardy') }} - {{ $pageTitle ?? ($header ?? 'Dashboard') }}</title>
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-pink-300">
-        <div class="flex h-screen">
-            <aside class="w-64 text-white shadow-lg relative flex flex-col" style="background: linear-gradient(to bottom, #f9a8b8, #fbc8d4);">
-                <div class="p-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg text-white" style="background-color: #4DC9C2;">
-                            C
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold text-white">Cardy</h1>
-                            <p class="text-xs text-pink-100">Gestión de Fábrica</p>
+        <div class="flex h-screen overflow-hidden">
+            {{-- SIDEBAR: flex-col + h-screen para que ocupe toda la altura --}}
+            <aside class="w-64 text-white shadow-lg flex flex-col h-screen flex-shrink-0" style="background: linear-gradient(to bottom, #f9a8b8, #fbc8d4);">
+
+                {{-- LOGO + MARCA — fijo arriba, nunca se desplaza --}}
+                <div class="flex-shrink-0 px-5 py-4 border-b border-pink-300">
+                    <div class="flex items-center gap-3">
+                        <img src="{{ asset('images/logocardy.jpg') }}"
+                             alt="Logo Cardy"
+                             class="rounded-lg object-contain flex-shrink-0"
+                             style="height: 48px; width: 48px;">
+                        <div class="min-w-0">
+                            <h1 class="text-lg font-bold text-white leading-tight">Cardy</h1>
+                            <p class="text-[11px] text-pink-100 leading-tight">Fábrica de Calzado</p>
                         </div>
                     </div>
                 </div>
 
-                <nav class="mt-4 flex-1 overflow-y-auto">
+                {{-- NAV — ocupa el espacio restante y hace scroll internamente --}}
+                <nav class="flex-1 overflow-y-auto py-4 pb-2">
                     <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-6 py-3 hover:bg-pink-300 transition-colors @if(request()->routeIs('dashboard')) bg-pink-300 border-r-4 @endif" style="@if(request()->routeIs('dashboard')) border-color: #4DC9C2; @endif">
                         <svg class="w-5 h-5 text-pink-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9M9 21h6a2 2 0 002-2V9a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -97,23 +102,37 @@
                     </div>
                 </nav>
 
-                <div class="border-t border-pink-300 p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3 flex-1 min-w-0">
-                            <div class="w-9 h-9 rounded-full flex items-center justify-center border-2 text-white" style="background-color: #4DC9C2; border-color: #3db5ae;">
-                                <span class="text-sm font-bold">{{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : '?' }}</span>
+                {{-- PERFIL DE USUARIO — fijo en la parte inferior, nunca se desplaza --}}
+                <div class="flex-shrink-0 border-t border-pink-300 p-4" style="background: linear-gradient(to bottom, #f9a8b8, #f4a0b2);">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            {{-- Avatar con inicial --}}
+                            <div class="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center border-2 text-white font-bold text-sm"
+                                 style="background-color: #4DC9C2; border-color: #3db5ae;">
+                                {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : '?' }}
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold text-white truncate leading-tight">{{ auth()->user()->name ?? 'Usuario' }}</p>
-                                <p class="text-[10px] uppercase font-bold text-pink-100">{{ auth()->user()->role->name ?? 'Admin' }}</p>
-                                <p class="text-[10px] text-pink-200 truncate">{{ auth()->user()->email ?? '' }}</p>
+                            {{-- Datos del usuario --}}
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-semibold text-white truncate leading-tight">
+                                    {{ auth()->user()->name ?? 'Usuario' }}
+                                </p>
+                                <p class="text-[10px] uppercase font-bold text-pink-100 leading-tight">
+                                    {{ auth()->user()->role->name ?? 'Sin rol' }}
+                                </p>
+                                <p class="text-[10px] text-pink-200 truncate">
+                                    {{ auth()->user()->email ?? '' }}
+                                </p>
                             </div>
                         </div>
-                        <form action="{{ route('logout') }}" method="POST">
+                        {{-- Botón logout --}}
+                        <form action="{{ route('logout') }}" method="POST" class="flex-shrink-0">
                             @csrf
-                            <button type="submit" class="text-pink-100 hover:text-white transition-colors p-1">
+                            <button type="submit"
+                                    title="Cerrar sesión"
+                                    class="text-pink-100 hover:text-white transition-colors p-1 rounded hover:bg-pink-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                 </svg>
                             </button>
                         </form>
@@ -121,13 +140,13 @@
                 </div>
             </aside>
 
-            <div class="flex-1 flex flex-col overflow-hidden">
-                <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+                <header class="flex-shrink-0 bg-white shadow-sm border-b border-gray-200">
                     <div class="max-w-full mx-auto py-4 px-6">
                         <h1 class="text-2xl font-semibold text-gray-900">{{ $header ?? 'Panel de Control' }}</h1>
                     </div>
                 </header>
-                <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <main class="flex-1 overflow-y-auto bg-gray-50">
                     @if(isset($slot))
                         {{ $slot }}
                     @else

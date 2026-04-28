@@ -1,9 +1,14 @@
-{{-- 
+{{--
     Componente: resources/views/components/import-export-bar.blade.php
-    Uso: <x-import-export-bar :importRoute="route('productos.import')" :exportExcel="route('productos.export.excel')" :exportCsv="route('productos.export.csv')" :exportPdf="route('productos.export.pdf')" />
+    Uso: <x-import-export-bar :importRoute="..." :exportExcel="..." :exportCsv="..." :exportPdf="..." :filters="$filters" />
+    $filters es un array asociativo con los filtros activos (opcional).
 --}}
 
-@props(['importRoute', 'exportExcel', 'exportCsv', 'exportPdf'])
+@props(['importRoute', 'exportExcel', 'exportCsv', 'exportPdf', 'filters' => []])
+
+@php
+    $qs = !empty($filters) ? '?' . http_build_query(array_filter($filters)) : '';
+@endphp
 
 <div class="flex flex-wrap items-center gap-3 mb-6">
     {{-- Importar --}}
@@ -19,7 +24,7 @@
     </form>
 
     {{-- Exportar Excel --}}
-    <a href="{{ $exportExcel }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #1D6F42;">
+    <a href="{{ $exportExcel . $qs }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #1D6F42;">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
@@ -27,7 +32,7 @@
     </a>
 
     {{-- Exportar CSV --}}
-    <a href="{{ $exportCsv }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #6B7280;">
+    <a href="{{ $exportCsv . $qs }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #6B7280;">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
@@ -35,14 +40,16 @@
     </a>
 
     {{-- Exportar PDF --}}
-    <a href="{{ $exportPdf }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #fab8c7;">
+    <a href="{{ $exportPdf . $qs }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background-color: #fab8c7;">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
         PDF
     </a>
 
-    @if(session('success'))
-        <span class="text-sm text-green-600 font-medium">✅ {{ session('success') }}</span>
+    @if(!empty(array_filter($filters ?? [])))
+        <span class="text-xs text-amber-700 bg-amber-100 px-2 py-1 rounded-full font-medium">
+            ⚡ Exportando con filtros activos
+        </span>
     @endif
 </div>

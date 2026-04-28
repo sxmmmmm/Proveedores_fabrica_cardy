@@ -2,13 +2,13 @@
 
 namespace App\Exports;
 
-use App\Models\Cliente;
+use App\Models\Empleado;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ClientesExport implements FromCollection, WithHeadings, WithStyles
+class EmpleadosExport implements FromCollection, WithHeadings, WithStyles
 {
     protected array $filters;
 
@@ -19,7 +19,7 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles
 
     public function collection()
     {
-        $query = Cliente::query();
+        $query = Empleado::query();
 
         if (!empty($this->filters['search'])) {
             $s = $this->filters['search'];
@@ -30,24 +30,29 @@ class ClientesExport implements FromCollection, WithHeadings, WithStyles
             });
         }
 
+        if (!empty($this->filters['cargo'])) {
+            $query->where('cargo', $this->filters['cargo']);
+        }
+
         if (!empty($this->filters['ciudad'])) {
             $query->where('ciudad', $this->filters['ciudad']);
         }
 
-        return $query->orderBy('nombre')->get()->map(fn($c) => [
-            'ID'        => $c->id,
-            'Nombre'    => $c->nombre,
-            'Documento' => $c->documento,
-            'Teléfono'  => $c->telefono,
-            'Correo'    => $c->correo,
-            'Ciudad'    => $c->ciudad,
-            'Dirección' => $c->direccion,
+        return $query->orderBy('nombre')->get()->map(fn($e) => [
+            'ID'        => $e->id,
+            'Nombre'    => $e->nombre,
+            'Documento' => $e->documento,
+            'Teléfono'  => $e->telefono,
+            'Correo'    => $e->correo,
+            'Cargo'     => $e->cargo,
+            'Dirección' => $e->direccion,
+            'Ciudad'    => $e->ciudad,
         ]);
     }
 
     public function headings(): array
     {
-        return ['ID', 'Nombre', 'Documento', 'Teléfono', 'Correo', 'Ciudad', 'Dirección'];
+        return ['ID', 'Nombre', 'Documento', 'Teléfono', 'Correo', 'Cargo', 'Dirección', 'Ciudad'];
     }
 
     public function styles(Worksheet $sheet)

@@ -35,15 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('materias-primas', MateriaPrimaController::class)
         ->parameters(['materias-primas' => 'materiaPrima']);
 
-    Route::get('/export/complete', [ExportController::class, 'exportComplete'])->name('export.complete');
-    Route::get('/export/empleados', [ExportController::class, 'exportEmpleados'])->name('export.empleados');
-    Route::get('/export/productos', [ExportController::class, 'exportProductos'])->name('export.productos');
-    Route::get('/export/materias-primas', [ExportController::class, 'exportMateriasPrimas'])->name('export.materias_primas');
-    Route::get('/export/proveedores', [ExportController::class, 'exportProveedores'])->name('export.proveedores');
-    Route::get('/export/clientes', [ExportController::class, 'exportClientes'])->name('export.clientes');
-
     Route::get('/roles/management', [RoleManagementController::class, 'index'])->name('roles.management');
     Route::post('/roles/{user}/update', [RoleManagementController::class, 'updateRole'])->name('roles.update');
+
+    // --- GESTIÓN DE USUARIOS (Registro desde panel admin) ---
+    Route::get('/users', [RoleManagementController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [RoleManagementController::class, 'create'])->name('users.create');
+    Route::post('/users', [RoleManagementController::class, 'store'])->name('users.store');
 
 
     // --- RUTAS DE EXPORTACIÃ“N (Reportes) ---
@@ -73,9 +71,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-});
-
-
     // --- IMPORT / EXPORT ---
     Route::post('/productos/import', [ImportExportController::class, 'importProductos'])->name('productos.import');
     Route::get('/productos/export/excel', [ImportExportController::class, 'exportProductosExcel'])->name('productos.export.excel');
@@ -97,6 +92,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/proveedores/export/csv', [ImportExportController::class, 'exportProveedoresCsv'])->name('proveedores.export.csv');
     Route::get('/proveedores/export/pdf', [ImportExportController::class, 'exportProveedoresPdf'])->name('proveedores.export.pdf');
 
-require __DIR__.'/auth.php';
+    Route::post('/empleados/import', [ImportExportController::class, 'importEmpleados'])->name('empleados.import');
+    Route::get('/empleados/export/excel', [ImportExportController::class, 'exportEmpleadosExcel'])->name('empleados.export.excel');
+    Route::get('/empleados/export/csv', [ImportExportController::class, 'exportEmpleadosCsv'])->name('empleados.export.csv');
+    Route::get('/empleados/export/pdf', [ImportExportController::class, 'exportEmpleadosPdf'])->name('empleados.export.pdf');
 
+});
+
+
+require __DIR__.'/auth.php';
 
