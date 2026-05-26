@@ -90,15 +90,15 @@
                             <td class="px-3 py-2 border">${{ number_format($m->precio, 2) }}</td>
                             <td class="px-3 py-2 border">{{ $m->empleado->nombre ?? 'Sin asignar' }}</td>
                             <td class="px-3 py-2 border">
-                                <div class="flex gap-2 justify-center items-center">
+                                <div class="flex gap-2 justify-center">
                                     <x-action-button color="teal" :href="route('materias-primas.edit', $m)">
-                                        Editar
+                                        ✏ Editar
                                     </x-action-button>
                                     <form action="{{ route('materias-primas.destroy', $m) }}" method="POST"
-                                          onsubmit="return confirm('¿Eliminar esta materia prima?');" style="margin:0;">
+                                          onsubmit="return confirm('¿Eliminar esta materia prima?');">
                                         @csrf @method('DELETE')
                                         <x-action-button color="pink" type="submit">
-                                            Eliminar
+                                            🗑 Eliminar
                                         </x-action-button>
                                     </form>
                                 </div>

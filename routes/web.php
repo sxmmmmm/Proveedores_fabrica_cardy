@@ -87,11 +87,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/clientes/export/csv', [ImportExportController::class, 'exportClientesCsv'])->name('clientes.export.csv');
     Route::get('/clientes/export/pdf', [ImportExportController::class, 'exportClientesPdf'])->name('clientes.export.pdf');
 
+  
+    Route::resource('proveedores', ProveedorController::class);
+
+    Route::get('/proveedores/{proveedor}/pago',  [ProveedorController::class, 'pago'])->name('proveedores.pago');
+    Route::post('/proveedores/{proveedor}/pago', [ProveedorController::class, 'storePago'])->name('proveedores.pago.store');
+
     Route::post('/proveedores/import', [ImportExportController::class, 'importProveedores'])->name('proveedores.import');
     Route::get('/proveedores/export/excel', [ImportExportController::class, 'exportProveedoresExcel'])->name('proveedores.export.excel');
-    Route::get('/proveedores/export/csv', [ImportExportController::class, 'exportProveedoresCsv'])->name('proveedores.export.csv');
-    Route::get('/proveedores/export/pdf', [ImportExportController::class, 'exportProveedoresPdf'])->name('proveedores.export.pdf');
-
+    Route::get('/proveedores/export/csv',   [ImportExportController::class, 'exportProveedoresCsv'])->name('proveedores.export.csv');
+    Route::get('/proveedores/export/pdf',   [ImportExportController::class, 'exportProveedoresPdf'])->name('proveedores.export.pdf');
     Route::post('/empleados/import', [ImportExportController::class, 'importEmpleados'])->name('empleados.import');
     Route::get('/empleados/export/excel', [ImportExportController::class, 'exportEmpleadosExcel'])->name('empleados.export.excel');
     Route::get('/empleados/export/csv', [ImportExportController::class, 'exportEmpleadosCsv'])->name('empleados.export.csv');

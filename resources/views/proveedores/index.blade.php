@@ -10,11 +10,9 @@
                 <h2 class="text-2xl font-bold text-gray-900">Gestión de Proveedores</h2>
                 <p class="text-sm text-gray-500 mt-1">Administra los proveedores registrados en el sistema.</p>
             </div>
-            <a href="{{ route('proveedores.create') }}"
-               style="background-color: #4DC9C2; color: black"
-               class="px-4 py-2 rounded font-medium whitespace-nowrap">
+            <x-action-button color="teal" href="{{ route('proveedores.create') }}">
                 + Nuevo Proveedor
-            </a>
+            </x-action-button>
         </div>
 
         {{-- Filtros --}}
@@ -46,10 +44,8 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" style="background-color: #4DC9C2;"
-                            class="text-white px-4 py-1.5 rounded text-sm font-medium">Filtrar</button>
-                    <a href="{{ route('proveedores.index') }}"
-                       class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded text-sm font-medium">Limpiar</a>
+                    <x-action-button color="teal" type="submit">Filtrar</x-action-button>
+                    <x-action-button color="gray" href="{{ route('proveedores.index') }}">Limpiar</x-action-button>
                 </div>
             </div>
         </form>
@@ -81,7 +77,7 @@
                         <th class="px-3 py-2 border text-white font-semibold">Correo</th>
                         <th class="px-3 py-2 border text-white font-semibold">Ciudad</th>
                         <th class="px-3 py-2 border text-white font-semibold">Mercancía</th>
-                        <th class="px-3 py-2 border text-white font-semibold">Acciones</th>
+                        <th class="px-3 py-2 border text-white font-semibold w-56">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,20 +92,27 @@
                             <td class="px-3 py-2 border">{{ $proveedor->ciudad }}</td>
                             <td class="px-3 py-2 border">{{ $proveedor->mercancia }}</td>
                             <td class="px-3 py-2 border">
-                                <div class="flex gap-1 justify-center">
-                                    <a href="{{ route('proveedores.edit', $proveedor->id) }}"
-                                       style="background-color: #4DC9C2;"
-                                       class="text-white px-2 py-1 rounded text-xs">Editar</a>
-                                    <form action="{{ route('proveedores.destroy', $proveedor->id) }}" method="POST">
-                                        @csrf @method('DELETE')
-                                        <button style="background-color: #F4A7B9;"
-                                                class="text-white px-2 py-1 rounded text-xs">Eliminar</button>
-                                    </form>
-                                </div>
+                                <div class="flex gap-2 justify-center items-center">
+                                <x-action-button color="teal" :href="route('proveedores.edit', $proveedor->id)">
+                                    Editar
+                                </x-action-button>
+                                <x-action-button color="green" :href="route('proveedores.pago', $proveedor->id)">
+                                     Pagar
+                                </x-action-button>
+                                <form action="{{ route('proveedores.destroy', $proveedor->id) }}" method="POST"
+                                      onsubmit="return confirm('¿Eliminar este proveedor?');" style="margin:0;">
+                                    @csrf @method('DELETE')
+                                    <x-action-button color="pink" type="submit">
+                                        Eliminar
+                                    </x-action-button>
+                                </form>
+                            </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="p-4 text-gray-500">No hay proveedores registrados</td></tr>
+                        <tr>
+                            <td colspan="8" class="p-6 text-gray-400 text-center">No hay proveedores registrados</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

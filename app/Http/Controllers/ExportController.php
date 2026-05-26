@@ -13,6 +13,7 @@ class ExportController extends Controller
 {
     public function exportComplete()
     {
+        ini_set('memory_limit', '512M');
         $data = [
             'empleados' => Empleado::all(),
             'productos' => Producto::all(),
@@ -86,4 +87,5 @@ class ExportController extends Controller
         return $pdf->download('reporte-clientes-'.date('Y-m-d').'.pdf');
     }
 }
+
 

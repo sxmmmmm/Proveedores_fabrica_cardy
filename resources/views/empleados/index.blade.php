@@ -10,11 +10,9 @@
                 <h2 class="text-2xl font-bold text-gray-900">Gestión de Empleados</h2>
                 <p class="text-sm text-gray-500 mt-1">Administra el personal registrado en la fábrica.</p>
             </div>
-            <a href="{{ route('empleados.create') }}"
-               style="background-color: #4DC9C2; color: black"
-               class="px-4 py-2 rounded font-medium whitespace-nowrap">
+            <x-action-button color="teal" href="{{ route('empleados.create') }}">
                 + Nuevo Empleado
-            </a>
+            </x-action-button>
         </div>
 
         {{-- Filtros --}}
@@ -46,10 +44,8 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" style="background-color: #4DC9C2;"
-                            class="text-white px-4 py-1.5 rounded text-sm font-medium">Filtrar</button>
-                    <a href="{{ route('empleados.index') }}"
-                       class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded text-sm font-medium">Limpiar</a>
+                    <x-action-button color="teal" type="submit">Filtrar</x-action-button>
+                    <x-action-button color="gray" href="{{ route('empleados.index') }}">Limpiar</x-action-button>
                 </div>
             </div>
         </form>
@@ -80,7 +76,7 @@
                         <th class="px-3 py-2 border text-white font-semibold">Teléfono</th>
                         <th class="px-3 py-2 border text-white font-semibold">Correo</th>
                         <th class="px-3 py-2 border text-white font-semibold">Ciudad</th>
-                        <th class="px-3 py-2 border text-white font-semibold">Acciones</th>
+                        <th class="px-3 py-2 border text-white font-semibold w-44">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,21 +90,24 @@
                             <td class="px-3 py-2 border">{{ $empleado->correo ?? 'N/A' }}</td>
                             <td class="px-3 py-2 border">{{ $empleado->ciudad ?? 'N/A' }}</td>
                             <td class="px-3 py-2 border">
-                                <div class="flex gap-1 justify-center">
-                                    <a href="{{ route('empleados.edit', $empleado) }}"
-                                       style="background-color: #4DC9C2;"
-                                       class="text-white px-2 py-1 rounded text-xs">Editar</a>
+                                <div class="flex gap-2 justify-center items-center">
+                                    <x-action-button color="teal" :href="route('empleados.edit', $empleado)">
+                                        Editar
+                                    </x-action-button>
                                     <form action="{{ route('empleados.destroy', $empleado) }}" method="POST"
-                                          onsubmit="return confirm('¿Eliminar este empleado?');">
+                                          onsubmit="return confirm('¿Eliminar este empleado?');" style="margin:0;">
                                         @csrf @method('DELETE')
-                                        <button style="background-color: #F4A7B9;"
-                                                class="text-white px-2 py-1 rounded text-xs">Eliminar</button>
+                                        <x-action-button color="pink" type="submit">
+                                            Eliminar
+                                        </x-action-button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="p-4 text-gray-500">No hay empleados registrados</td></tr>
+                        <tr>
+                            <td colspan="7" class="p-6 text-gray-400 text-center">No hay empleados registrados</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

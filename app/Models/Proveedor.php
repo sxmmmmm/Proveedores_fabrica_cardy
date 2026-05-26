@@ -22,4 +22,19 @@ class Proveedor extends Model
         'direccion',
         'mercancia'
     ];
+
+
+    public function pagos()
+    {
+        return $this->hasMany(PagoProveedor::class);
+    }
+
+    // Total pagado a este proveedor
+    public function getTotalPagadoAttribute(): float
+    {
+        return $this->pagos()->where('estado', 'completado')->sum('monto');
+    }
 }
+
+
+    

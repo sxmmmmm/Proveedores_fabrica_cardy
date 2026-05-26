@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
+use App\Models\PagoProveedor;
 
 class ProveedorController extends Controller
 {
@@ -75,5 +76,41 @@ class ProveedorController extends Controller
     {
         $proveedore->delete();
         return redirect()->route('proveedores.index')->with('success', 'Proveedor eliminado correctamente');
+    }
+
+    public function pago(Proveedor $proveedor)
+    {
+        $pagos = $proveedor->pagos()
+                           ->latest('fecha_pago')
+                           ->get();
+
+        return view('proveedores.pago', compact('proveedor', 'pagos'));
+    }
+
+    
+    public function storePago(Request $request, Proveedor $proveedor)
+    {
+        $request->validate([
+            'monto'       => 'required|numeric|min:0.01',
+            'fecha_pago'  => 'required|date',
+            'metodo_pago' => 'required|in:efectivo,transferencia,cheque,nequi,daviplata,otro',
+            'referencia'  => 'nullable|string|max:100',
+            'concepto'    => 'nullable|string|max:500',
+        ]);
+
+        PagoProveedor::create([
+            'proveedor_id'   => $proveedor->id,
+            'monto'          => $request->monto,
+            'fecha_pago'     => $request->fecha_pago,
+            'metodo_pago'    => $request->metodo_pago,
+            'referencia'     => $request->referencia,
+            'concepto'       => $request->concepto,
+            'estado'         => 'completado',
+            'registrado_por' => auth()->id(),
+        ]);
+
+        return redirect()
+            ->route('proveedores.pago', $proveedor)
+            ->with('success', 'Pago registrado correctamente.');
     }
 }

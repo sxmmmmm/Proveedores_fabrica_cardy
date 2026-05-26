@@ -1,4 +1,4 @@
-﻿<x-with-sidebar-layout>
+<x-with-sidebar-layout>
 
     <x-slot name="pageTitle">Gestión de Productos</x-slot>
     <x-slot name="header">Productos</x-slot>
@@ -10,11 +10,9 @@
                 <h2 class="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
                 <p class="text-sm text-gray-500 mt-1">Administra el catálogo de productos de la fábrica.</p>
             </div>
-            <a href="{{ route('productos.create') }}"
-               style="background-color: #4DC9C2; color: black"
-               class="px-4 py-2 rounded font-medium whitespace-nowrap">
+            <x-action-button color="teal" href="{{ route('productos.create') }}">
                 + Nuevo Producto
-            </a>
+            </x-action-button>
         </div>
 
         {{-- Filtros --}}
@@ -49,10 +47,8 @@
                            class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300">
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" style="background-color: #4DC9C2;"
-                            class="text-white px-4 py-1.5 rounded text-sm font-medium">Filtrar</button>
-                    <a href="{{ route('productos.index') }}"
-                       class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded text-sm font-medium">Limpiar</a>
+                    <x-action-button color="teal" type="submit">Filtrar</x-action-button>
+                    <x-action-button color="gray" href="{{ route('productos.index') }}">Limpiar</x-action-button>
                 </div>
             </div>
         </form>
@@ -81,7 +77,7 @@
                         <th class="px-3 py-2 border text-white font-semibold">Stock</th>
                         <th class="px-3 py-2 border text-white font-semibold">Precio</th>
                         <th class="px-3 py-2 border text-white font-semibold">Materia Prima</th>
-                        <th class="px-3 py-2 border text-white font-semibold">Acciones</th>
+                        <th class="px-3 py-2 border text-white font-semibold w-44">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,22 +91,24 @@
                                 {{ optional($producto->materiaPrima)->nombre ?? 'Sin materia prima' }}
                             </td>
                             <td class="px-3 py-2 border">
-                            <div class="flex gap-2 justify-center items-center">
-                                <x-action-button color="teal" :href="route('productos.edit', $producto)">
-                                    Editar
-                                </x-action-button>
-                                <form action="{{ route('productos.destroy', $producto) }}" method="POST"
-                                      onsubmit="return confirm('¿Eliminar este producto?');" style="margin:0;">
-                                    @csrf @method('DELETE')
-                                    <x-action-button color="pink" type="submit">
-                                        Eliminar
+                                <div class="flex gap-2 justify-center">
+                                    <x-action-button color="teal" :href="route('productos.edit', $producto)">
+                                        ✏ Editar
                                     </x-action-button>
-                                </form>
-                            </div>
-                        </td>
+                                    <form action="{{ route('productos.destroy', $producto) }}" method="POST"
+                                          onsubmit="return confirm('¿Eliminar este producto?');">
+                                        @csrf @method('DELETE')
+                                        <x-action-button color="pink" type="submit">
+                                            🗑 Eliminar
+                                        </x-action-button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="p-4 text-gray-500">No hay productos registrados</td></tr>
+                        <tr>
+                            <td colspan="5" class="p-6 text-gray-400 text-center">No hay productos registrados</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
