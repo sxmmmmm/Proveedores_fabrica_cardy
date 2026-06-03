@@ -76,16 +76,12 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
-    }
-
-    public function isManager(): bool
-    {
-        return $this->hasRole('manager');
+        return $this->role && in_array($this->role->name, ['admin', 'Administrador']);
     }
 
     public function isEmployee(): bool
     {
-        return $this->hasRole('employee');
+        // Bodeguero tiene acceso a Empleados, Materias Primas y Productos
+        return $this->role && in_array($this->role->name, ['employee', 'Empleado', 'Bodeguero', 'Vendedor']);
     }
 }

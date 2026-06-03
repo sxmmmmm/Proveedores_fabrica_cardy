@@ -12,48 +12,67 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <style>
+            * { box-sizing: border-box; }
             body {
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
             }
+
+            /* ── Sidebar: flex column, fixed height ── */
             .sidebar {
                 position: fixed;
                 left: 0;
                 top: 0;
                 width: 256px;
                 height: 100vh;
-                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
                 z-index: 1000;
                 background: linear-gradient(180deg, #fab8c7 0%, #f59db8 50%, #f08fab 100%);
             }
+
+            /* ── Nav scrolls independently ── */
+            .sidebar-nav {
+                flex: 1;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255,255,255,0.25) transparent;
+            }
+            .sidebar-nav::-webkit-scrollbar { width: 3px; }
+            .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }
+
+            /* ── User footer: never moves, always visible ── */
+            .sidebar-user-footer {
+                flex-shrink: 0;
+                border-top: 1px solid rgba(255,255,255,0.15);
+                background-color: rgba(0,0,0,0.15);
+                padding: 12px 16px;
+            }
+
             .main-content {
                 margin-left: 256px;
                 height: 100vh;
                 display: flex;
                 flex-direction: column;
             }
-            .header {
-                flex-shrink: 0;
-            }
-            .content {
-                flex: 1;
-                overflow-y: auto;
-            }
+            .header { flex-shrink: 0; }
+            .content { flex: 1; overflow-y: auto; }
+
             .sidebar-link-active {
                 background-color: rgba(77, 201, 194, 0.3) !important;
                 border-left: 3px solid #4DC9C2;
                 padding-left: calc(1.5rem - 3px) !important;
             }
-            .sidebar-link-hover {
-                background-color: rgba(255, 255, 255, 0.1);
+            .sidebar-link-hover:hover {
+                background-color: rgba(255, 255, 255, 0.12);
             }
         </style>
     </head>
     <body class="font-sans antialiased bg-gray-100">
         <!-- Sidebar -->
         <aside class="sidebar text-white shadow-lg">
-            <div class="p-6 border-b" style="border-bottom-color: rgba(255, 255, 255, 0.1);">
+            <div class="p-6 border-b" style="border-bottom-color: rgba(255, 255, 255, 0.1); flex-shrink: 0;">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center font-bold text-lg" style="color: #fab8c7;">
                         C
@@ -65,7 +84,7 @@
                 </div>
             </div>
 
-            <nav class="mt-8">
+            <nav class="sidebar-nav mt-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-6 py-3 transition-colors @if(request()->routeIs('dashboard')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('dashboard')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9M9 21h6a2 2 0 002-2V9a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -73,7 +92,11 @@
                     <span>Dashboard</span>
                 </a>
 
-                <!-- Sección de Inventario -->
+                {{-- ── EMPLEADO: solo ve Empleados y Materias Primas ── --}}
+                {{-- ── ADMINISTRADOR: ve todo ── --}}
+
+                <!-- Inventario (solo admin) -->
+                @if(auth()->user()->isAdmin())
                 <div class="mt-6">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Inventario</p>
                     <a href="{{ route('productos.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('productos.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('productos.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
@@ -90,8 +113,9 @@
                         <span class="text-sm">Materias Primas</span>
                     </a>
                 </div>
+                @endif
 
-                <!-- Sección de Personas -->
+                <!-- Personas: Empleados (todos) | Clientes (solo admin) -->
                 <div class="mt-6">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Personas</p>
                     <a href="{{ route('empleados.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('empleados.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('empleados.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
@@ -101,15 +125,31 @@
                         <span class="text-sm">Empleados</span>
                     </a>
 
+                    @if(auth()->user()->isAdmin())
                     <a href="{{ route('clientes.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('clientes.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('clientes.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="text-sm">Clientes</span>
                     </a>
+                    @endif
                 </div>
 
-                <!-- Sección de Negocio -->
+                <!-- Materias Primas para empleado (acceso directo) -->
+                @if(auth()->user()->isEmployee())
+                <div class="mt-6">
+                    <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Inventario</p>
+                    <a href="{{ route('materias-primas.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('materias-primas.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('materias-primas.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                        </svg>
+                        <span class="text-sm">Materias Primas</span>
+                    </a>
+                </div>
+                @endif
+
+                <!-- Negocio (solo admin) -->
+                @if(auth()->user()->isAdmin())
                 <div class="mt-6">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Negocio</p>
                     <a href="{{ route('proveedores.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('proveedores.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('proveedores.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
@@ -120,7 +160,7 @@
                     </a>
                 </div>
 
-                <!-- Sección de Movimientos -->
+                <!-- Movimientos (solo admin) -->
                 <div class="mt-6">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Movimientos</p>
                     <a href="{{ route('entradas-materia-prima.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('entradas-materia-prima.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('entradas-materia-prima.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
@@ -129,14 +169,12 @@
                         </svg>
                         <span class="text-sm">Entrada Materias Primas</span>
                     </a>
-
                     <a href="{{ route('salidas-materia-prima.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('salidas-materia-prima.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('salidas-materia-prima.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                         </svg>
                         <span class="text-sm">Salida Materias Primas</span>
                     </a>
-
                     <a href="{{ route('salidas-productos.index') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('salidas-productos.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('salidas-productos.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path>
@@ -145,20 +183,18 @@
                     </a>
                 </div>
 
-                <!-- Sección de Administración -->
-                @if(auth()->user()->isAdmin())
+                <!-- Administración (solo admin) -->
                 <div class="mt-6">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Administración</p>
-                    <a href="{{ route('roles.management') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('roles.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('roles.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
+                    <a href="{{ route('roles.management') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors @if(request()->routeIs('roles.*') || request()->routeIs('users.*')) sidebar-link-active @else sidebar-link-hover hover:bg-opacity-20 @endif" style="@if(request()->routeIs('roles.*') || request()->routeIs('users.*')) background-color: rgba(77, 201, 194, 0.3); border-left: 3px solid #4DC9C2; padding-left: calc(1.5rem - 3px); @else background-color: transparent; @endif">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                         </svg>
                         <span class="text-sm">Gestión de Roles</span>
                     </a>
                 </div>
-                @endif
 
-                <!-- Sección de Reportes -->
+                <!-- Reportes (solo admin) -->
                 <div class="mt-6 pb-32">
                     <p class="px-6 text-xs font-semibold opacity-80 uppercase tracking-wide">Reportes</p>
                     <a href="{{ route('export.complete') }}" class="flex items-center space-x-3 px-6 py-2 mt-2 transition-colors sidebar-link-hover hover:bg-opacity-20" style="background-color: transparent;">
@@ -168,30 +204,37 @@
                         <span class="text-sm">Descargar PDF</span>
                     </a>
                 </div>
+                @endif
+
             </nav>
 
-            <!-- User Section at bottom -->
-            <div class="absolute bottom-0 left-0 right-0 w-64 border-t" style="background-color: rgba(0, 0, 0, 0.15); border-top-color: rgba(255, 255, 255, 0.1);">
-                <div class="p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3 flex-1">
-                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-xs font-bold" style="color: #fab8c7;">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold truncate">{{ auth()->user()->name }}</p>
-                                <p class="text-xs opacity-90 truncate">{{ auth()->user()->role->name ?? 'Usuario' }}</p>
-                            </div>
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="hover:text-white transition-colors opacity-80 hover:opacity-100" title="Cerrar sesión">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                </svg>
-                            </button>
-                        </form>
+            <!-- User footer — pinned at bottom, never scrolls -->
+            <div class="sidebar-user-footer">
+                <div class="flex items-center gap-3">
+                    {{-- Avatar --}}
+                    <div style="width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;background:#4DC9C2;border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;flex-shrink:0;">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
+                    {{-- Info --}}
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-white truncate leading-tight">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-pink-100 truncate" style="opacity:0.8;">{{ auth()->user()->role->name ?? 'Usuario' }}</p>
+                        <p class="text-xs text-pink-200 truncate" style="opacity:0.6; font-size:0.65rem;">{{ auth()->user()->email }}</p>
+                    </div>
+                    {{-- Logout --}}
+                    <form action="{{ route('logout') }}" method="POST" style="flex-shrink:0;">
+                        @csrf
+                        <button type="submit"
+                                title="Cerrar sesión"
+                                style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.65);padding:6px;border-radius:8px;display:flex;align-items:center;transition:background 0.15s,color 0.15s;"
+                                onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'"
+                                onmouseout="this.style.background='none';this.style.color='rgba(255,255,255,0.65)'">
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </form>
                 </div>
             </div>
         </aside>

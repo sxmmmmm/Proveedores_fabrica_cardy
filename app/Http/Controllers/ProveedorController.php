@@ -4,37 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
-use App\Models\PagoProveedor;
 
 class ProveedorController extends Controller
 {
-    public function index(Request $request)
+    private function buildQuery(Request $request)
     {
         $query = Proveedor::query();
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('empresa', 'like', "%{$search}%")
-                  ->orWhere('documento', 'like', "%{$search}%")
-                  ->orWhere('correo', 'like', "%{$search}%");
+        if ($s = $request->get('search')) {
+            $query->where(function ($q) use ($s) {
+                $q->where('nombre', 'like', "%$s%")
+                  ->orWhere('empresa', 'like', "%$s%")
+                  ->orWhere('documento', 'like', "%$s%")
+                  ->orWhere('correo', 'like', "%$s%")
+                  ->orWhere('ciudad', 'like', "%$s%")
+                  ->orWhere('mercancia', 'like', "%$s%");
             });
         }
-
-        if ($ciudad = $request->input('ciudad')) {
-            $query->where('ciudad', $ciudad);
+        if ($ciudad = $request->get('ciudad')) {
+            $query->where('ciudad', 'like', "%$ciudad%");
+        }
+        if ($mercancia = $request->get('mercancia')) {
+            $query->where('mercancia', 'like', "%$mercancia%");
         }
 
-        if ($mercancia = $request->input('mercancia')) {
-            $query->where('mercancia', $mercancia);
-        }
+        return $query;
+    }
 
-        $proveedores = $query->orderBy('nombre')->paginate(15)->withQueryString();
+    public function index(Request $request)
+    {
+        $perPage     = in_array($request->get('per_page'), [15, 25, 50, 100]) ? $request->get('per_page') : 15;
+        $proveedores = $this->buildQuery($request)->orderBy('nombre')->paginate($perPage)->withQueryString();
         $ciudades    = Proveedor::select('ciudad')->whereNotNull('ciudad')->distinct()->orderBy('ciudad')->pluck('ciudad');
         $mercancias  = Proveedor::select('mercancia')->whereNotNull('mercancia')->distinct()->orderBy('mercancia')->pluck('mercancia');
-        $filters     = $request->only(['search', 'ciudad', 'mercancia']);
 
-        return view('proveedores.index', compact('proveedores', 'ciudades', 'mercancias', 'filters'));
+        return view('proveedores.index', compact('proveedores', 'ciudades', 'mercancias'));
     }
 
     public function create()
@@ -57,7 +61,6 @@ class ProveedorController extends Controller
         ]);
 
         Proveedor::create($request->all());
-
         return redirect()->route('proveedores.index')->with('success', 'Proveedor agregado correctamente');
     }
 
@@ -76,41 +79,5 @@ class ProveedorController extends Controller
     {
         $proveedore->delete();
         return redirect()->route('proveedores.index')->with('success', 'Proveedor eliminado correctamente');
-    }
-
-    public function pago(Proveedor $proveedor)
-    {
-        $pagos = $proveedor->pagos()
-                           ->latest('fecha_pago')
-                           ->get();
-
-        return view('proveedores.pago', compact('proveedor', 'pagos'));
-    }
-
-    
-    public function storePago(Request $request, Proveedor $proveedor)
-    {
-        $request->validate([
-            'monto'       => 'required|numeric|min:0.01',
-            'fecha_pago'  => 'required|date',
-            'metodo_pago' => 'required|in:efectivo,transferencia,cheque,nequi,daviplata,otro',
-            'referencia'  => 'nullable|string|max:100',
-            'concepto'    => 'nullable|string|max:500',
-        ]);
-
-        PagoProveedor::create([
-            'proveedor_id'   => $proveedor->id,
-            'monto'          => $request->monto,
-            'fecha_pago'     => $request->fecha_pago,
-            'metodo_pago'    => $request->metodo_pago,
-            'referencia'     => $request->referencia,
-            'concepto'       => $request->concepto,
-            'estado'         => 'completado',
-            'registrado_por' => auth()->id(),
-        ]);
-
-        return redirect()
-            ->route('proveedores.pago', $proveedor)
-            ->with('success', 'Pago registrado correctamente.');
     }
 }
