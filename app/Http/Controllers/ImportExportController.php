@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException as ExcelValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\Producto;
@@ -24,15 +25,97 @@ use App\Exports\ClientesExport;
 use App\Exports\ProveedoresExport;
 use App\Exports\EmpleadosExport;
 
+use App\Mail\ImportacionExitosaMail;
+use App\Mail\StockBajoMail;
+use Illuminate\Support\Facades\Mail;
+
 class ImportExportController extends Controller
 {
+    // ──────────────────────────────────────────────────────────────────────────
+    // HELPER: procesa el import, captura fallos y notifica si corresponde
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Ejecuta la importación y devuelve una redirección con éxito o errores.
+     *
+     * @param  mixed   $import       Instancia del Import (usa SkipsFailures)
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  string  $entidad      Nombre legible (ej. "Productos")
+     * @param  string  $stockCheck   Modelo a revisar para alertas de stock (o null)
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function runImport($import, $file, string $entidad, ?string $modelClass = null)
+    {
+        try {
+            Excel::import($import, $file);
+        } catch (ExcelValidationException $e) {
+            // Error de validación global (cabeceras faltantes, etc.)
+            $messages = collect($e->failures())->map(fn($f) =>
+                "Fila {$f->row()}: " . implode(', ', $f->errors())
+            )->all();
+
+            return back()
+                ->withErrors(['import_errors' => $messages])
+                ->with('import_modal', true);
+        }
+
+        // Fallos de fila recogidos con SkipsFailures
+        $failures = $import->failures();
+
+        if ($failures->isNotEmpty()) {
+            $messages = $failures->map(fn($f) =>
+                "Fila {$f->row()} — " . implode(' | ', $f->errors())
+            )->values()->all();
+
+            return back()
+                ->withErrors(['import_errors' => $messages])
+                ->with('import_modal', true);
+        }
+
+        // Importación exitosa: enviar correo al usuario autenticado
+        $user = auth()->user();
+        if ($user && $user->email) {
+            try {
+                Mail::to($user->email)->send(new ImportacionExitosaMail($entidad, $user->name ?? 'Usuario'));
+            } catch (\Throwable $e) {
+                // No bloquear la importación si el correo falla
+                \Log::warning("No se pudo enviar correo de importación: " . $e->getMessage());
+            }
+        }
+
+        // Verificar stock bajo si aplica
+        if ($modelClass) {
+            $this->checkStockBajo($modelClass, $entidad);
+        }
+
+        return back()->with('success', "{$entidad} importados correctamente.");
+    }
+
+    /**
+     * Revisa ítems con stock ≤ 5 y envía alerta al administrador.
+     */
+    private function checkStockBajo(string $modelClass, string $entidad): void
+    {
+        try {
+            $items = $modelClass::where('stock', '<=', 5)->get();
+            if ($items->isNotEmpty()) {
+                $admin = \App\Models\User::whereHas('role', fn($q) => $q->where('name', 'Administrador'))
+                    ->first();
+                if ($admin && $admin->email) {
+                    Mail::to($admin->email)->send(new StockBajoMail($entidad, $items));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning("No se pudo enviar correo de stock bajo: " . $e->getMessage());
+        }
+    }
+
     // ==================== PRODUCTOS ====================
 
     public function importProductos(Request $request)
     {
         $request->validate(['archivo' => 'required|file|mimes:xlsx,xls,csv']);
-        Excel::import(new ProductosImport, $request->file('archivo'));
-        return back()->with('success', 'Productos importados correctamente.');
+        return $this->runImport(new ProductosImport, $request->file('archivo'), 'Productos', Producto::class);
     }
 
     public function exportProductosExcel(Request $request)
@@ -49,8 +132,8 @@ class ImportExportController extends Controller
 
     public function exportProductosPdf(Request $request)
     {
-        $filters  = $request->only(['search', 'stock_min', 'precio_max', 'materia_prima_id']);
-        $query    = Producto::with('materiaPrima');
+        $filters   = $request->only(['search', 'stock_min', 'precio_max', 'materia_prima_id']);
+        $query     = Producto::with('materiaPrima');
         $this->applyProductoFilters($query, $filters);
         $productos = $query->orderBy('nombre')->get();
         $pdf = Pdf::loadView('pdf.productos-pdf', compact('productos'))->setPaper('a4', 'landscape');
@@ -63,8 +146,8 @@ class ImportExportController extends Controller
             $s = $filters['search'];
             $query->where(fn($q) => $q->where('nombre', 'like', "%{$s}%")->orWhere('descripcion', 'like', "%{$s}%"));
         }
-        if (!empty($filters['stock_min']))      $query->where('stock', '>=', $filters['stock_min']);
-        if (!empty($filters['precio_max']))     $query->where('precio', '<=', $filters['precio_max']);
+        if (!empty($filters['stock_min']))        $query->where('stock', '>=', $filters['stock_min']);
+        if (!empty($filters['precio_max']))       $query->where('precio', '<=', $filters['precio_max']);
         if (!empty($filters['materia_prima_id'])) $query->where('materia_prima_id', $filters['materia_prima_id']);
     }
 
@@ -73,8 +156,7 @@ class ImportExportController extends Controller
     public function importMateriasPrimas(Request $request)
     {
         $request->validate(['archivo' => 'required|file|mimes:xlsx,xls,csv']);
-        Excel::import(new MateriasPrimasImport, $request->file('archivo'));
-        return back()->with('success', 'Materias primas importadas correctamente.');
+        return $this->runImport(new MateriasPrimasImport, $request->file('archivo'), 'Materias Primas', MateriaPrima::class);
     }
 
     public function exportMateriasPrimasExcel(Request $request)
@@ -109,8 +191,7 @@ class ImportExportController extends Controller
     public function importClientes(Request $request)
     {
         $request->validate(['archivo' => 'required|file|mimes:xlsx,xls,csv']);
-        Excel::import(new ClientesImport, $request->file('archivo'));
-        return back()->with('success', 'Clientes importados correctamente.');
+        return $this->runImport(new ClientesImport, $request->file('archivo'), 'Clientes');
     }
 
     public function exportClientesExcel(Request $request)
@@ -127,8 +208,8 @@ class ImportExportController extends Controller
 
     public function exportClientesPdf(Request $request)
     {
-        $filters = $request->only(['search', 'ciudad']);
-        $query   = Cliente::query();
+        $filters  = $request->only(['search', 'ciudad']);
+        $query    = Cliente::query();
         if (!empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(fn($q) => $q->where('nombre', 'like', "%{$s}%")->orWhere('documento', 'like', "%{$s}%")->orWhere('correo', 'like', "%{$s}%"));
@@ -144,8 +225,7 @@ class ImportExportController extends Controller
     public function importProveedores(Request $request)
     {
         $request->validate(['archivo' => 'required|file|mimes:xlsx,xls,csv']);
-        Excel::import(new ProveedoresImport, $request->file('archivo'));
-        return back()->with('success', 'Proveedores importados correctamente.');
+        return $this->runImport(new ProveedoresImport, $request->file('archivo'), 'Proveedores');
     }
 
     public function exportProveedoresExcel(Request $request)
@@ -162,8 +242,8 @@ class ImportExportController extends Controller
 
     public function exportProveedoresPdf(Request $request)
     {
-        $filters = $request->only(['search', 'ciudad', 'mercancia']);
-        $query   = Proveedor::query();
+        $filters     = $request->only(['search', 'ciudad', 'mercancia']);
+        $query       = Proveedor::query();
         if (!empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(fn($q) => $q->where('nombre', 'like', "%{$s}%")->orWhere('empresa', 'like', "%{$s}%")->orWhere('documento', 'like', "%{$s}%")->orWhere('correo', 'like', "%{$s}%"));
@@ -180,8 +260,7 @@ class ImportExportController extends Controller
     public function importEmpleados(Request $request)
     {
         $request->validate(['archivo' => 'required|file|mimes:xlsx,xls,csv']);
-        Excel::import(new EmpleadosImport, $request->file('archivo'));
-        return back()->with('success', 'Empleados importados correctamente.');
+        return $this->runImport(new EmpleadosImport, $request->file('archivo'), 'Empleados');
     }
 
     public function exportEmpleadosExcel(Request $request)
@@ -198,8 +277,8 @@ class ImportExportController extends Controller
 
     public function exportEmpleadosPdf(Request $request)
     {
-        $filters = $request->only(['search', 'cargo', 'ciudad']);
-        $query   = Empleado::query();
+        $filters   = $request->only(['search', 'cargo', 'ciudad']);
+        $query     = Empleado::query();
         if (!empty($filters['search'])) {
             $s = $filters['search'];
             $query->where(fn($q) => $q->where('nombre', 'like', "%{$s}%")->orWhere('documento', 'like', "%{$s}%")->orWhere('correo', 'like', "%{$s}%"));

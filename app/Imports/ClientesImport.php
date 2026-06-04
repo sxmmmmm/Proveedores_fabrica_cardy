@@ -5,22 +5,52 @@ namespace App\Imports;
 use App\Models\Cliente;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsOnError;
-use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\WithTransactions;
 
-class ClientesImport implements ToModel, WithHeadingRow, SkipsOnError
+class ClientesImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, WithTransactions
 {
-    use SkipsErrors;
+    use SkipsFailures;
 
     public function model(array $row)
     {
         return new Cliente([
-            'nombre'     => $row['nombre'],
-            'documento'  => $row['documento'] ?? null,
-            'telefono'   => $row['telefono'] ?? null,
-            'correo'     => $row['correo'] ?? null,
-            'ciudad'     => $row['ciudad'] ?? null,
-            'direccion'  => $row['direccion'] ?? null,
+            'nombre'    => trim($row['nombre']),
+            'documento' => isset($row['documento']) ? trim($row['documento']) : null,
+            'telefono'  => isset($row['telefono']) ? trim($row['telefono']) : null,
+            'correo'    => isset($row['correo']) ? trim($row['correo']) : null,
+            'ciudad'    => isset($row['ciudad']) ? trim($row['ciudad']) : null,
+            'direccion' => isset($row['direccion']) ? trim($row['direccion']) : null,
         ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'nombre'   => ['required', 'string', 'max:255'],
+            'correo'   => ['nullable', 'email', 'max:255'],
+            'telefono' => ['nullable', 'string', 'max:30'],
+        ];
+    }
+
+    public function customValidationMessages(): array
+    {
+        return [
+            'nombre.required' => 'La fila :attribute: el campo "nombre" es obligatorio.',
+            'nombre.string'   => 'La fila :attribute: el campo "nombre" debe ser texto.',
+            'correo.email'    => 'La fila :attribute: el campo "correo" no tiene un formato de email válido.',
+            'telefono.string' => 'La fila :attribute: el campo "teléfono" debe ser texto.',
+        ];
+    }
+
+    public function customValidationAttributes(): array
+    {
+        return [
+            'nombre'   => 'Nombre',
+            'correo'   => 'Correo',
+            'telefono' => 'Teléfono',
+        ];
     }
 }

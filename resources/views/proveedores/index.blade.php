@@ -152,11 +152,12 @@
     </x-filter-card>
 
     {{-- Export / Import --}}
-    <x-export-buttons
-        :excel="route('proveedores.export.excel', request()->only(['search','ciudad','mercancia']))"
-        :csv="route('proveedores.export.csv', request()->only(['search','ciudad','mercancia']))"
-        :pdf="route('proveedores.export.pdf', request()->only(['search','ciudad','mercancia']))"
+    <x-import-export-bar
         :importRoute="route('proveedores.import')"
+        :exportExcel="route('proveedores.export.excel')"
+        :exportCsv="route('proveedores.export.csv')"
+        :exportPdf="route('proveedores.export.pdf')"
+        :filters="request()->only(['search','ciudad','mercancia'])"
     />
 
     @if(session('success'))

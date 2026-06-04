@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -83,5 +84,13 @@ class User extends Authenticatable
     {
         // Bodeguero tiene acceso a Empleados, Materias Primas y Productos
         return $this->role && in_array($this->role->name, ['employee', 'Empleado', 'Bodeguero', 'Vendedor']);
+    }
+
+    /**
+     * Usar nuestra plantilla corporativa para el correo de restablecimiento de contraseña.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
