@@ -198,7 +198,7 @@
                     <button type="button"
                             @click="showForgot = true"
                             class="text-sm font-medium transition hover:opacity-70"
-                            style="color: #14B8A6;">
+                            style="color: #D11A7A;">
                         ¿Olvidaste tu contraseña?
                     </button>
                 </div>

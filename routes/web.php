@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
         // Gestión de roles y usuarios
         Route::get('/roles/management', [RoleManagementController::class, 'index'])->name('roles.management');
         Route::post('/roles/{user}/update', [RoleManagementController::class, 'updateRole'])->name('roles.update');
+        Route::post('/roles/{user}/reset-password', [RoleManagementController::class, 'resetPassword'])->name('roles.reset-password');
         Route::get('/users',        [RoleManagementController::class, 'index'])->name('users.index');
         Route::get('/users/create', [RoleManagementController::class, 'create'])->name('users.create');
         Route::post('/users',       [RoleManagementController::class, 'store'])->name('users.store');
