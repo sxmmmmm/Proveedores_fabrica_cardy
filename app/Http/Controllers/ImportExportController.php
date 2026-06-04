@@ -53,7 +53,6 @@ class ImportExportController extends Controller
         try {
             Excel::import($import, $file);
         } catch (ExcelValidationException $e) {
-            // Error de validación global (cabeceras faltantes, etc.)
             $messages = collect($e->failures())->map(fn($f) =>
                 "Fila {$f->row()}: " . implode(', ', $f->errors())
             )->all();
@@ -63,7 +62,7 @@ class ImportExportController extends Controller
                 ->with('import_modal', true);
         }
 
-        // Fallos de fila recogidos con SkipsFailures
+        // Fallos de validación de fila (SkipsFailures)
         $failures = $import->failures();
 
         if ($failures->isNotEmpty()) {
@@ -76,13 +75,24 @@ class ImportExportController extends Controller
                 ->with('import_modal', true);
         }
 
-        // Importación exitosa: enviar correo al usuario autenticado
+        // Construir mensaje con resumen de duplicados si el import los trackea
+        $insertados = property_exists($import, 'insertados') ? $import->insertados : null;
+        $omitidos   = property_exists($import, 'omitidos')   ? $import->omitidos   : null;
+
+        if ($insertados !== null && $omitidos > 0) {
+            $mensaje = "{$insertados} {$entidad} importados correctamente. {$omitidos} omitidos por ser duplicados.";
+        } elseif ($insertados !== null) {
+            $mensaje = "{$insertados} {$entidad} importados correctamente.";
+        } else {
+            $mensaje = "{$entidad} importados correctamente.";
+        }
+
+        // Enviar correo al usuario autenticado
         $user = auth()->user();
         if ($user && $user->email) {
             try {
                 Mail::to($user->email)->send(new ImportacionExitosaMail($entidad, $user->name ?? 'Usuario'));
             } catch (\Throwable $e) {
-                // No bloquear la importación si el correo falla
                 \Log::warning("No se pudo enviar correo de importación: " . $e->getMessage());
             }
         }
@@ -92,7 +102,7 @@ class ImportExportController extends Controller
             $this->checkStockBajo($modelClass, $entidad);
         }
 
-        return back()->with('success', "{$entidad} importados correctamente.");
+        return back()->with('success', $mensaje);
     }
 
     /**

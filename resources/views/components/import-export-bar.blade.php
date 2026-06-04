@@ -8,19 +8,19 @@
 @php
     $qs = !empty($filters) ? '?' . http_build_query(array_filter($filters)) : '';
     $hasImportErrors = $errors->has('import_errors') || session('import_modal');
+    $uniqueId = 'import_' . substr(md5($importRoute), 0, 8);
 @endphp
 
 {{-- ── MODAL DE ERRORES DE IMPORTACIÓN ──────────────────────────────── --}}
 <div x-data="{ openImportErrors: {{ $hasImportErrors ? 'true' : 'false' }} }">
 
-    {{-- Modal --}}
+    {{-- Modal errores --}}
     <div x-show="openImportErrors" x-cloak
          class="fixed inset-0 z-50 flex items-center justify-center p-4"
          style="background: rgba(0,0,0,0.55);">
         <div @click.stop
              class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
 
-            {{-- Header --}}
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0"
                  style="background:#FEF2F2; border-radius:12px 12px 0 0;">
                 <div class="flex items-center gap-2">
@@ -30,30 +30,26 @@
                     </svg>
                     <h3 class="text-base font-bold text-red-700">Errores en la importación</h3>
                 </div>
-                <button @click="openImportErrors = false"
-                        class="text-gray-400 hover:text-gray-600 transition">
+                <button @click="openImportErrors = false" class="text-gray-400 hover:text-gray-600 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
 
-            {{-- Body --}}
             <div class="p-6 overflow-y-auto flex-1">
                 <p class="text-sm text-gray-600 mb-4">
-                    El archivo contiene errores de validación. <strong>No se importó ningún registro.</strong>
-                    Corrija los problemas indicados y vuelva a intentarlo.
+                    El archivo contiene errores de validación.
+                    Los registros válidos <strong>sí fueron importados</strong>.
+                    Corrija los errores indicados para reimportar las filas omitidas.
                 </p>
-
                 @if($errors->has('import_errors'))
                     <ul class="space-y-2">
                         @foreach((array) $errors->get('import_errors') as $group)
                             @foreach((array) $group as $msg)
                                 <li class="flex items-start gap-2 text-sm bg-red-50 border border-red-100 rounded-lg px-3 py-2 text-red-700">
                                     <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                              clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                     </svg>
                                     {{ $msg }}
                                 </li>
@@ -63,7 +59,6 @@
                 @endif
             </div>
 
-            {{-- Footer --}}
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0" style="border-radius:0 0 12px 12px;">
                 <button @click="openImportErrors = false"
                         class="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
@@ -77,22 +72,35 @@
     {{-- ── BARRA DE BOTONES ─────────────────────────────────────────────── --}}
     <div class="flex flex-wrap items-center gap-3 mb-6">
 
-        {{-- Importar --}}
-        <form action="{{ $importRoute }}" method="POST" enctype="multipart/form-data"
-              class="flex items-center gap-2" id="import-form">
+        {{-- ── Importar: form independiente fuera de Alpine para evitar problemas de CSRF --}}
+        <form
+            id="{{ $uniqueId }}_form"
+            action="{{ $importRoute }}"
+            method="POST"
+            enctype="multipart/form-data"
+            style="display:inline;">
             @csrf
-            <label class="flex items-center gap-2 cursor-pointer px-4 py-2 rounded-lg text-sm font-medium text-white transition"
-                   style="background-color: #14B8A6;"
-                   onmouseover="this.style.backgroundColor='#0d9488'"
-                   onmouseout="this.style.backgroundColor='#14B8A6'">
+            <input
+                type="file"
+                id="{{ $uniqueId }}_file"
+                name="archivo"
+                accept=".csv,.xlsx,.xls"
+                style="display:none;"
+                onchange="document.getElementById('{{ $uniqueId }}_form').submit();">
+
+            <button
+                type="button"
+                onclick="document.getElementById('{{ $uniqueId }}_file').click()"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+                style="background-color: #14B8A6;"
+                onmouseover="this.style.backgroundColor='#0d9488'"
+                onmouseout="this.style.backgroundColor='#14B8A6'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                 </svg>
                 Importar CSV/Excel
-                <input type="file" name="archivo" accept=".csv,.xlsx,.xls" class="hidden"
-                       onchange="this.form.submit()">
-            </label>
+            </button>
         </form>
 
         {{-- Exportar Excel --}}

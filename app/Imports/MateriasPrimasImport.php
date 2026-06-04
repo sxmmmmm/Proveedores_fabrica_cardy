@@ -8,18 +8,30 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Maatwebsite\Excel\Concerns\WithTransactions;
 
-class MateriasPrimasImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, WithTransactions
+class MateriasPrimasImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
 {
     use SkipsFailures;
 
+    public int $insertados = 0;
+    public int $omitidos   = 0;
+
     public function model(array $row)
     {
+        $nombre = trim($row['nombre'] ?? '');
+        if ($nombre === '') return null;
+
+        // Duplicado por nombre exacto
+        if (MateriaPrima::whereRaw('LOWER(nombre) = ?', [strtolower($nombre)])->exists()) {
+            $this->omitidos++;
+            return null;
+        }
+
+        $this->insertados++;
         return new MateriaPrima([
-            'nombre'      => trim($row['nombre']),
-            'tipo'        => isset($row['tipo']) ? trim($row['tipo']) : null,
-            'color'       => isset($row['color']) ? trim($row['color']) : null,
+            'nombre'      => $nombre,
+            'tipo'        => isset($row['tipo'])        ? trim($row['tipo'])        : null,
+            'color'       => isset($row['color'])       ? trim($row['color'])       : null,
             'stock'       => $row['stock'],
             'precio'      => $row['precio'],
             'empleado_id' => $row['empleado_id'] ?? null,
@@ -29,9 +41,9 @@ class MateriasPrimasImport implements ToModel, WithHeadingRow, WithValidation, S
     public function rules(): array
     {
         return [
-            'nombre' => ['required', 'string', 'max:255'],
-            'stock'  => ['required', 'integer', 'min:0'],
-            'precio' => ['required', 'numeric', 'min:0'],
+            'nombre'      => ['required', 'string', 'max:255'],
+            'stock'       => ['required', 'integer', 'min:0'],
+            'precio'      => ['required', 'numeric', 'min:0'],
             'empleado_id' => ['nullable', 'integer', 'exists:empleados,id'],
         ];
     }
@@ -39,15 +51,15 @@ class MateriasPrimasImport implements ToModel, WithHeadingRow, WithValidation, S
     public function customValidationMessages(): array
     {
         return [
-            'nombre.required'      => 'La fila :attribute: el campo "nombre" es obligatorio.',
-            'nombre.string'        => 'La fila :attribute: el campo "nombre" debe ser texto.',
-            'stock.required'       => 'La fila :attribute: el campo "stock" es obligatorio.',
-            'stock.integer'        => 'La fila :attribute: el campo "stock" debe ser un número entero.',
-            'stock.min'            => 'La fila :attribute: el campo "stock" no puede ser negativo.',
-            'precio.required'      => 'La fila :attribute: el campo "precio" es obligatorio.',
-            'precio.numeric'       => 'La fila :attribute: el campo "precio" debe ser un número válido.',
-            'precio.min'           => 'La fila :attribute: el campo "precio" no puede ser negativo.',
-            'empleado_id.exists'   => 'La fila :attribute: el ID de empleado indicado no existe en el sistema.',
+            'nombre.required'    => 'Fila :attribute: el campo "nombre" es obligatorio.',
+            'nombre.string'      => 'Fila :attribute: el campo "nombre" debe ser texto.',
+            'stock.required'     => 'Fila :attribute: el campo "stock" es obligatorio.',
+            'stock.integer'      => 'Fila :attribute: el campo "stock" debe ser un número entero.',
+            'stock.min'          => 'Fila :attribute: el campo "stock" no puede ser negativo.',
+            'precio.required'    => 'Fila :attribute: el campo "precio" es obligatorio.',
+            'precio.numeric'     => 'Fila :attribute: el campo "precio" debe ser un número válido.',
+            'precio.min'         => 'Fila :attribute: el campo "precio" no puede ser negativo.',
+            'empleado_id.exists' => 'Fila :attribute: el ID de empleado no existe en el sistema.',
         ];
     }
 
