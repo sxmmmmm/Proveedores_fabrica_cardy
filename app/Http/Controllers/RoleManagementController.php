@@ -95,12 +95,44 @@ class RoleManagementController extends Controller
             'nueva_password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
-        // Actualizar contraseña cifrada
-        $user->update([
-            'password' => Hash::make($request->nueva_password),
+        $this->aplicarNuevaPassword($user, $request->nueva_password);
+
+        return redirect()->route('roles.management')
+            ->with('success', "Contraseña de \"{$user->name}\" restablecida. Correo enviado a {$user->email}.");
+    }
+
+    /**
+     * ── Generar contraseña automática y enviarla al usuario ──
+     */
+    public function generatePassword(User $user)
+    {
+        if (!auth()->user()->isAdmin()) abort(403);
+
+        // Genera contraseña segura: 4 bloques separados por guión
+        $nueva = implode('-', [
+            substr(str_shuffle('abcdefghjkmnpqrstuvwxyz'), 0, 3),
+            rand(100, 999),
+            strtoupper(substr(str_shuffle('ABCDEFGHJKMNPQRSTUVWXYZ'), 0, 3)),
+            substr(str_shuffle('!@#$%&*'), 0, 1) . rand(10, 99),
         ]);
 
-        // Marcar todas las solicitudes pendientes de ese usuario como resueltas
+        $this->aplicarNuevaPassword($user, $nueva);
+
+        return redirect()->route('roles.management')
+            ->with('success', "Contraseña automática generada para \"{$user->name}\". Correo enviado a {$user->email}.");
+    }
+
+    /**
+     * ── Lógica compartida: cifrar, guardar, resolver solicitudes, enviar correo ──
+     */
+    private function aplicarNuevaPassword(User $user, string $plainPassword): void
+    {
+        // 1. Actualizar contraseña cifrada con bcrypt
+        $user->update([
+            'password' => Hash::make($plainPassword),
+        ]);
+
+        // 2. Marcar todas las solicitudes pendientes como resueltas
         PasswordResetRequest::where('user_id', $user->id)
             ->whereNull('resolved_at')
             ->update([
@@ -108,16 +140,13 @@ class RoleManagementController extends Controller
                 'resolved_by' => auth()->id(),
             ]);
 
-        // Enviar correo al usuario con su nueva contraseña
+        // 3. Enviar correo con la nueva contraseña en texto claro
         try {
             Mail::to($user->email)->send(
-                new ContraseniaRestablecidaMail($user->name, $request->nueva_password)
+                new ContraseniaRestablecidaMail($user->name, $plainPassword)
             );
         } catch (\Throwable $e) {
-            \Log::warning("No se pudo enviar correo de contraseña restablecida a {$user->email}: " . $e->getMessage());
+            \Log::error("Error al enviar correo de reset a {$user->email}: " . $e->getMessage());
         }
-
-        return redirect()->route('roles.management')
-            ->with('success', "Contraseña de \"{$user->name}\" restablecida y correo enviado correctamente.");
     }
 }
