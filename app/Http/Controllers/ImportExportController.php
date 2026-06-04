@@ -19,6 +19,10 @@ use App\Imports\ClientesImport;
 use App\Imports\ProveedoresImport;
 use App\Imports\EmpleadosImport;
 
+use App\Models\EntradaMateriaPrima;
+use App\Models\SalidaMateriaPrima;
+use App\Models\SalidaProducto;
+
 use App\Exports\ProductosExport;
 use App\Exports\MateriasPrimasExport;
 use App\Exports\ClientesExport;
@@ -288,5 +292,171 @@ class ImportExportController extends Controller
         $empleados = $query->orderBy('nombre')->get();
         $pdf = Pdf::loadView('pdf.empleados-pdf', compact('empleados'))->setPaper('a4', 'landscape');
         return $pdf->download('empleados.pdf');
+    }
+
+    // ==================== ENTRADAS MATERIA PRIMA ====================
+
+    public function exportEntradasExcel(Request $request)
+    {
+        $entradas = EntradaMateriaPrima::with(['materiaPrima', 'user'])
+            ->latest()->get();
+        // Exportación simple como array
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($entradas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                                \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($e) => [
+                    'ID'              => $e->id,
+                    'Materia Prima'   => optional($e->materiaPrima)->nombre,
+                    'Cantidad'        => $e->cantidad,
+                    'Fecha'           => $e->fecha?->format('d/m/Y'),
+                    'Usuario'         => $e->user?->name ?? $e->usuario_nombre,
+                    'Observación'     => $e->observacion,
+                    'Registrado en'   => $e->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Materia Prima','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'entradas_materia_prima.xlsx'
+        );
+    }
+
+    public function exportEntradasCsv(Request $request)
+    {
+        $entradas = EntradaMateriaPrima::with(['materiaPrima', 'user'])->latest()->get();
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($entradas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                                \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($e) => [
+                    $e->id,
+                    optional($e->materiaPrima)->nombre,
+                    $e->cantidad,
+                    $e->fecha?->format('d/m/Y'),
+                    $e->user?->name ?? $e->usuario_nombre,
+                    $e->observacion,
+                    $e->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Materia Prima','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'entradas_materia_prima.csv',
+            \Maatwebsite\Excel\Excel::CSV
+        );
+    }
+
+    public function exportEntradasPdf(Request $request)
+    {
+        $entradas = EntradaMateriaPrima::with(['materiaPrima', 'user'])->latest()->get();
+        $pdf = Pdf::loadView('pdf.entradas-materia-prima-pdf', compact('entradas'))->setPaper('a4', 'landscape');
+        return $pdf->download('entradas_materia_prima.pdf');
+    }
+
+    // ==================== SALIDAS MATERIA PRIMA ====================
+
+    public function exportSalidasMpExcel(Request $request)
+    {
+        $salidas = SalidaMateriaPrima::with(['materiaPrima', 'user'])->latest()->get();
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($salidas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                               \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($s) => [
+                    $s->id,
+                    optional($s->materiaPrima)->nombre,
+                    $s->cantidad,
+                    $s->fecha?->format('d/m/Y'),
+                    $s->user?->name ?? $s->usuario_nombre,
+                    $s->observacion,
+                    $s->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Materia Prima','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'salidas_materia_prima.xlsx'
+        );
+    }
+
+    public function exportSalidasMpCsv(Request $request)
+    {
+        $salidas = SalidaMateriaPrima::with(['materiaPrima', 'user'])->latest()->get();
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($salidas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                               \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($s) => [
+                    $s->id,
+                    optional($s->materiaPrima)->nombre,
+                    $s->cantidad,
+                    $s->fecha?->format('d/m/Y'),
+                    $s->user?->name ?? $s->usuario_nombre,
+                    $s->observacion,
+                    $s->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Materia Prima','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'salidas_materia_prima.csv',
+            \Maatwebsite\Excel\Excel::CSV
+        );
+    }
+
+    public function exportSalidasMpPdf(Request $request)
+    {
+        $salidas = SalidaMateriaPrima::with(['materiaPrima', 'user'])->latest()->get();
+        $pdf = Pdf::loadView('pdf.salidas-materia-prima-pdf', compact('salidas'))->setPaper('a4', 'landscape');
+        return $pdf->download('salidas_materia_prima.pdf');
+    }
+
+    // ==================== SALIDAS PRODUCTOS ====================
+
+    public function exportSalidasProductosExcel(Request $request)
+    {
+        $salidas = SalidaProducto::with(['producto', 'cliente', 'user'])->latest()->get();
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($salidas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                               \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($s) => [
+                    $s->id,
+                    optional($s->producto)->nombre,
+                    optional($s->cliente)->nombre,
+                    $s->cantidad,
+                    $s->fecha?->format('d/m/Y'),
+                    $s->user?->name ?? $s->usuario_nombre,
+                    $s->observacion,
+                    $s->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Producto','Cliente','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'salidas_productos.xlsx'
+        );
+    }
+
+    public function exportSalidasProductosCsv(Request $request)
+    {
+        $salidas = SalidaProducto::with(['producto', 'cliente', 'user'])->latest()->get();
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new class($salidas) implements \Maatwebsite\Excel\Concerns\FromCollection,
+                                               \Maatwebsite\Excel\Concerns\WithHeadings {
+                public function __construct(private $data) {}
+                public function collection() { return $this->data->map(fn($s) => [
+                    $s->id,
+                    optional($s->producto)->nombre,
+                    optional($s->cliente)->nombre,
+                    $s->cantidad,
+                    $s->fecha?->format('d/m/Y'),
+                    $s->user?->name ?? $s->usuario_nombre,
+                    $s->observacion,
+                    $s->created_at?->format('d/m/Y H:i'),
+                ]); }
+                public function headings(): array { return ['ID','Producto','Cliente','Cantidad','Fecha','Usuario','Observación','Registrado en']; }
+            },
+            'salidas_productos.csv',
+            \Maatwebsite\Excel\Excel::CSV
+        );
+    }
+
+    public function exportSalidasProductosPdf(Request $request)
+    {
+        $salidas = SalidaProducto::with(['producto', 'cliente', 'user'])->latest()->get();
+        $pdf = Pdf::loadView('pdf.salidas-productos-pdf', compact('salidas'))->setPaper('a4', 'landscape');
+        return $pdf->download('salidas_productos.pdf');
     }
 }
