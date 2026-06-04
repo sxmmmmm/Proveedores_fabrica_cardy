@@ -32,8 +32,9 @@ class MateriaPrimaController extends Controller
         $tipos    = MateriaPrima::select('tipo')->whereNotNull('tipo')->distinct()->orderBy('tipo')->pluck('tipo');
         $colores  = MateriaPrima::select('color')->whereNotNull('color')->distinct()->orderBy('color')->pluck('color');
         $filters  = $request->only(['search', 'tipo', 'color']);
+        $empleados = Empleado::orderBy('nombre')->get();
 
-        return view('materias_primas.index', compact('materias', 'tipos', 'colores', 'filters'));
+        return view('materias_primas.index', compact('materias', 'tipos', 'colores', 'filters', 'empleados'));
     }
 
     public function create()

@@ -32,11 +32,13 @@ class SalidaProductoController extends Controller
             $query->whereDate('created_at', '<=', $fechaHasta);
         }
 
-        $salidas  = $query->latest()->paginate(15)->withQueryString();
-        $usuarios = User::orderBy('name')->get();
-        $filters  = $request->only(['search', 'user_id', 'fecha_desde', 'fecha_hasta']);
+        $salidas   = $query->latest()->paginate(15)->withQueryString();
+        $usuarios  = User::orderBy('name')->get();
+        $filters   = $request->only(['search', 'user_id', 'fecha_desde', 'fecha_hasta']);
+        $productos = Producto::orderBy('nombre')->get();
+        $clientes  = Cliente::orderBy('nombre')->get();
 
-        return view('salidas_productos.index', compact('salidas', 'usuarios', 'filters'));
+        return view('salidas_productos.index', compact('salidas', 'usuarios', 'filters', 'productos', 'clientes'));
     }
 
     public function create()
