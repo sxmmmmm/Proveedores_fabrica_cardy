@@ -55,8 +55,8 @@ class RoleManagementController extends Controller
             'role_id' => $request->role_id,
         ]);
 
-        return redirect()->route('users.index')
-            ->with('success', 'Usuario creado exitosamente para el sistema Cardy.');
+        return redirect()->route('roles.management')
+            ->with('success', 'Usuario "' . $request->name . '" creado exitosamente.');
     }
 
     public function updateRole(Request $request, User $user)

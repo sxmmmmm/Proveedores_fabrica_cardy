@@ -34,7 +34,10 @@ class MateriaPrimaController extends Controller
         $filters  = $request->only(['search', 'tipo', 'color']);
         $empleados = Empleado::orderBy('nombre')->get();
 
-        return view('materias_primas.index', compact('materias', 'tipos', 'colores', 'filters', 'empleados'));
+        // Items con stock bajo (< 50) para el botón de notificaciones
+        $stockBajo = MateriaPrima::where('stock', '<', 50)->orderBy('stock')->get();
+
+        return view('materias_primas.index', compact('materias', 'tipos', 'colores', 'filters', 'empleados', 'stockBajo'));
     }
 
     public function create()

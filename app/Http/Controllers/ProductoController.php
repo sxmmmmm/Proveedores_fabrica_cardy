@@ -35,7 +35,10 @@ class ProductoController extends Controller
         $materias  = MateriaPrima::orderBy('nombre')->get();
         $filters   = $request->only(['search', 'stock_min', 'precio_max', 'materia_prima_id']);
 
-        return view('productos.index', compact('productos', 'materias', 'filters'));
+        // Items con stock bajo (< 50) para el botón de notificaciones
+        $stockBajo = Producto::where('stock', '<', 50)->orderBy('stock')->get();
+
+        return view('productos.index', compact('productos', 'materias', 'filters', 'stockBajo'));
     }
 
     public function create()

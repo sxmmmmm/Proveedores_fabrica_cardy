@@ -3,7 +3,7 @@
     <x-slot name="header">Productos</x-slot>
 
     {{-- ═══ MODAL CREAR PRODUCTO ═══ --}}
-    <div x-data="{ open: {{ $errors->any() && !old('_edit_id') ? 'true' : 'false' }} }">
+    <div x-data="{ open: {{ $errors->any() && !old('_edit_id') ? 'true' : 'false' }}, openStock: false }">
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-6">
@@ -11,14 +11,102 @@
                 <h2 class="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
                 <p class="text-sm text-gray-500 mt-1">{{ $productos->total() }} registros encontrados</p>
             </div>
-            <button @click="open = true"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
-                    style="background-color: #0F172A;">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Nuevo Producto
-            </button>
+            <div class="flex items-center gap-2">
+                {{-- Botón notificaciones stock bajo --}}
+                <button @click="openStock = true"
+                        class="relative inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+                        style="background-color: {{ $stockBajo->count() > 0 ? '#D97706' : '#6B7280' }};">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    Stock Bajo
+                    @if($stockBajo->count() > 0)
+                        <span class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center text-white"
+                              style="background-color: #EF4444;">
+                            {{ $stockBajo->count() }}
+                        </span>
+                    @endif
+                </button>
+
+                <button @click="open = true"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+                        style="background-color: #0F172A;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Nuevo Producto
+                </button>
+            </div>
+        </div>
+
+        {{-- ── Modal Stock Bajo ──────────────────────────────────────── --}}
+        <div x-show="openStock" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             style="background: rgba(0,0,0,0.5);">
+            <div @click.stop
+                 class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 flex-shrink-0"
+                     style="background: linear-gradient(135deg, #92400E, #D97706); border-radius: 12px 12px 0 0;">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Alerta de Stock Bajo</h3>
+                            <p class="text-xs text-yellow-100">Productos con menos de 50 unidades</p>
+                        </div>
+                    </div>
+                    <button @click="openStock = false" class="text-yellow-200 hover:text-white transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-5 overflow-y-auto flex-1">
+                    @if($stockBajo->count() > 0)
+                        <p class="text-sm text-gray-600 mb-4">
+                            Se encontraron <strong>{{ $stockBajo->count() }}</strong> productos con stock por debajo del umbral.
+                        </p>
+                        <div class="space-y-2">
+                            @foreach($stockBajo as $item)
+                                <div class="flex items-center justify-between px-4 py-3 rounded-lg border"
+                                     style="{{ $item->stock == 0 ? 'background:#FEF2F2; border-color:#FECACA;' : 'background:#FFFBEB; border-color:#FDE68A;' }}">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">{{ $item->nombre }}</p>
+                                        <p class="text-xs text-gray-500">{{ optional($item->materiaPrima)->nombre ?? 'Sin materia prima' }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-lg font-bold {{ $item->stock == 0 ? 'text-red-600' : 'text-amber-600' }}">
+                                            {{ $item->stock }}
+                                        </span>
+                                        <p class="text-xs text-gray-400">unidades</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="flex flex-col items-center justify-center py-10 text-center">
+                            <svg class="w-12 h-12 text-green-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="text-gray-600 font-medium">¡Todo en orden!</p>
+                            <p class="text-gray-400 text-sm mt-1">No hay productos con stock bajo.</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="px-5 py-4 border-t border-gray-100 bg-gray-50 flex-shrink-0" style="border-radius:0 0 12px 12px;">
+                    <button @click="openStock = false"
+                            class="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+                            style="background-color: #0F172A;">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Modal Crear -->
