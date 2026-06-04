@@ -13,17 +13,12 @@ class EntradaMateriaPrimaController extends Controller
     {
         $query = EntradaMateriaPrima::with(['materiaPrima', 'user']);
 
-        // Filtro: búsqueda por materia prima
         if ($search = $request->input('search')) {
             $query->whereHas('materiaPrima', fn($q) => $q->where('nombre', 'like', "%{$search}%"));
         }
-
-        // Filtro: usuario específico
         if ($userId = $request->input('user_id')) {
             $query->where('user_id', $userId);
         }
-
-        // Filtro: rango de fechas
         if ($fechaDesde = $request->input('fecha_desde')) {
             $query->whereDate('created_at', '>=', $fechaDesde);
         }
@@ -31,11 +26,12 @@ class EntradaMateriaPrimaController extends Controller
             $query->whereDate('created_at', '<=', $fechaHasta);
         }
 
-        $entradas = $query->latest()->paginate(15)->withQueryString();
-        $usuarios = User::orderBy('name')->get();
-        $filters  = $request->only(['search', 'user_id', 'fecha_desde', 'fecha_hasta']);
+        $entradas       = $query->latest()->paginate(15)->withQueryString();
+        $usuarios       = User::orderBy('name')->get();
+        $filters        = $request->only(['search', 'user_id', 'fecha_desde', 'fecha_hasta']);
+        $materiasPrimas = MateriaPrima::orderBy('nombre')->get();
 
-        return view('entradas_materia_prima.index', compact('entradas', 'usuarios', 'filters'));
+        return view('entradas_materia_prima.index', compact('entradas', 'usuarios', 'filters', 'materiasPrimas'));
     }
 
     public function create()

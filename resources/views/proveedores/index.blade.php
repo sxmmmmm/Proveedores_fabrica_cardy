@@ -120,36 +120,53 @@
     </div>
 
     {{-- Filtros --}}
-    <x-filter-card :action="route('proveedores.index')" :hasFilters="request()->hasAny(['search','ciudad','mercancia','per_page'])">
-        <input type="text" name="search" value="{{ request('search') }}"
-               placeholder="Buscar nombre, empresa, documento..."
-               class="col-span-2 w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-gray-50">
-
-        <select name="ciudad"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-gray-50">
-            <option value="">Todas las ciudades</option>
-            @foreach($ciudades as $c)
-                <option value="{{ $c }}" {{ request('ciudad')==$c ? 'selected':'' }}>{{ $c }}</option>
-            @endforeach
-        </select>
-
-        <select name="mercancia"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-gray-50">
-            <option value="">Toda la mercancía</option>
-            @foreach($mercancias as $m)
-                <option value="{{ $m }}" {{ request('mercancia')==$m ? 'selected':'' }}>{{ $m }}</option>
-            @endforeach
-        </select>
-
-        <x-slot name="actions">
-            <select name="per_page" onchange="this.form.submit()"
-                    class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none bg-gray-50">
-                @foreach([15,25,50,100] as $n)
-                    <option value="{{ $n }}" {{ request('per_page',15)==$n ? 'selected':'' }}>{{ $n }} / pág.</option>
-                @endforeach
-            </select>
-        </x-slot>
-    </x-filter-card>
+    <form method="GET" action="{{ route('proveedores.index') }}"
+          class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4">
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Buscar</label>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       placeholder="Buscar nombre, empresa, documento..."
+                       class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300">
+            </div>
+            <div class="min-w-[150px]">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Ciudad</label>
+                <select name="ciudad"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    <option value="">Todas las ciudades</option>
+                    @foreach($ciudades as $c)
+                        <option value="{{ $c }}" {{ request('ciudad')==$c ? 'selected':'' }}>{{ $c }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="min-w-[160px]">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Mercancía</label>
+                <select name="mercancia"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    <option value="">Toda la mercancía</option>
+                    @foreach($mercancias as $m)
+                        <option value="{{ $m }}" {{ request('mercancia')==$m ? 'selected':'' }}>{{ $m }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="min-w-[110px]">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Por página</label>
+                <select name="per_page" onchange="this.form.submit()"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    @foreach([15,25,50,100] as $n)
+                        <option value="{{ $n }}" {{ request('per_page',15)==$n ? 'selected':'' }}>{{ $n }} / pág.</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit"
+                        class="px-4 py-1.5 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+                        style="background-color: #14B8A6;">Filtrar</button>
+                <a href="{{ route('proveedores.index') }}"
+                   class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition">Limpiar</a>
+            </div>
+        </div>
+    </form>
 
     {{-- Export / Import --}}
     <x-import-export-bar
