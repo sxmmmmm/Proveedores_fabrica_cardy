@@ -32,7 +32,7 @@ class ClienteController extends Controller
 
     public function create()
     {
-        return view('clientes.create');
+        return redirect()->route('clientes.index', ['open_modal' => 1]);
     }
 
     public function store(Request $request)

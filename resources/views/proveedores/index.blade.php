@@ -6,7 +6,7 @@
          Se reabre automáticamente si hay errores de validación
          y no viene de una edición (no hay _edit_id en old())
     ════════════════════════════════════════════════════════════ --}}
-    <div x-data="{ open: {{ $errors->any() && !old('_edit_id') ? 'true' : 'false' }} }">
+    <div x-data="{ open: {{ ($errors->any() && !old('_edit_id')) || request('open_modal') ? 'true' : 'false' }} }">
 
         <!-- Botón Nuevo -->
         <div class="flex items-center justify-between mb-6">
@@ -214,17 +214,17 @@
                         <td class="px-4 py-3 text-gray-700">{{ $p->ciudad }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ $p->mercancia }}</td>
                         <td class="px-4 py-3">
-                            <div class="flex gap-1.5 justify-center">
+                            <div class="flex gap-1.5 justify-center items-center">
                                 <!-- Botón abrir modal editar -->
                                 <button @click="open = true"
-                                        class="px-3 py-1 rounded-lg text-xs font-medium text-white transition hover:opacity-90"
+                                        class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                         style="background:#14B8A6;">
                                     Editar
                                 </button>
-                                <form action="{{ route('proveedores.destroy', $p->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('proveedores.destroy', $p->id) }}" method="POST" style="display:contents;">
                                     @csrf @method('DELETE')
                                     <button type="submit"
-                                            class="px-3 py-1 rounded-lg text-xs font-medium text-white transition hover:opacity-90"
+                                            class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                             style="background:#E11D48;"
                                             onclick="return confirm('¿Eliminar este proveedor?')">
                                         Eliminar

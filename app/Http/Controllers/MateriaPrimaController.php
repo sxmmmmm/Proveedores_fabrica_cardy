@@ -42,8 +42,7 @@ class MateriaPrimaController extends Controller
 
     public function create()
     {
-        $empleados = Empleado::orderBy('nombre')->get();
-        return view('materias_primas.create', compact('empleados'));
+        return redirect()->route('materias-primas.index', ['open_modal' => 1]);
     }
 
     public function store(Request $request)

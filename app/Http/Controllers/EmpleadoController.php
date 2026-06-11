@@ -37,7 +37,7 @@ class EmpleadoController extends Controller
 
     public function create()
     {
-        return view('empleados.create');
+        return redirect()->route('empleados.index', ['open_modal' => 1]);
     }
 
     public function store(Request $request)

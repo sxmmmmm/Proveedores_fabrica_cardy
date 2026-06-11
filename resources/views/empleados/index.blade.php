@@ -3,7 +3,7 @@
     <x-slot name="header">Empleados</x-slot>
 
     {{-- ═══ MODAL CREAR EMPLEADO ═══ --}}
-    <div x-data="{ open: {{ $errors->any() && !old('_edit_id') ? 'true' : 'false' }} }">
+    <div x-data="{ open: {{ ($errors->any() && !old('_edit_id')) || request('open_modal') ? 'true' : 'false' }} }">
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-6">
@@ -268,16 +268,16 @@
                         <td class="px-4 py-3 text-gray-500 text-xs">{{ $empleado->correo ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-gray-700">{{ $empleado->ciudad ?? 'N/A' }}</td>
                         <td class="px-4 py-3">
-                            <div class="flex gap-1.5 justify-center">
+                            <div class="flex gap-1.5 justify-center items-center">
                                 <button @click="openEdit = true"
-                                        class="px-3 py-1 rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
+                                        class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                         style="background-color: #14B8A6;">
                                     Editar
                                 </button>
                                 <form action="{{ route('empleados.destroy', $empleado->id) }}" method="POST"
-                                      onsubmit="return confirm('¿Eliminar este empleado?');" style="display:inline;">
+                                      onsubmit="return confirm('¿Eliminar este empleado?');" style="display:contents;">
                                     @csrf @method('DELETE')
-                                    <button class="px-3 py-1 rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
+                                    <button class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                             style="background-color: #E11D48;">
                                         Eliminar
                                     </button>

@@ -1,86 +1,90 @@
 <x-with-sidebar-layout>
+    <x-slot name="pageTitle">Nuevo Proveedor</x-slot>
+    <x-slot name="header">Proveedores</x-slot>
 
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl  leading-tight">
-            
-            Nuevo Proveedor
-            
-        </h2>
-    </x-slot>
-
-    <div class="p-6 max-w-3xl mx-auto">
-
-        <div class="flex justify-between items-center mb-6">
-            <a href="{{ route('proveedores.index') }}"
-                style="color: black;"
-               class="text-gray-500 hover:text-gray-700">
-               
-                ← Volver a la lista
-            </a>
-        </div>
-
-        @if($errors->any())
-            <div class="bg-red-100 text-red-800 px-4 py-3 rounded mb-4">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <form action="{{ route('proveedores.store') }}" method="POST">
-                @csrf
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="nombre" class="block text-sm font-medium text-black-700 mb-1">Nombre</label>
-                        <input type="text" name="nombre" placeholder="Nombre" class="border p-2">
-                    </div>
-                    <div>
-                        <label for="empresa" class="block text-sm font-medium text-black-700 mb-1">Empresa</label>
-                        <input type="text" name="empresa" placeholder="Empresa" class="border p-2">
-                    </div>
-                    <div>
-                        <label for="documento" class="block text-sm font-medium text-black-700 mb-1">Documento</label>
-                        <input type="text" name="documento" placeholder="Documento" class="border p-2">
-                    </div> 
-                    <div>
-                        <label for="telefono" class="block text-sm font-medium text-black-700 mb-1">Teléfono</label>
-                        <input type="text" name="telefono" placeholder="Teléfono" class="border p-2">
-                    </div>
-                    <div>
-                        <label for="fecha_nacimiento" class="block text-sm font-medium text-black-700 mb-1">Fecha de Nacimiento</label>  
-                        <input type="date" name="fecha_nacimiento" class="border p-2">
-                    </div>
-                    <div>
-                        <label for="correo" class="block text-sm font-medium text-black-700 mb-1">Correo</label>
-                        <input type="email" name="correo" placeholder="Correo" class="border p-2">
-                    </div>
-                    <div>
-                        <label for="ciudad" class="block text-sm font-medium text-black-700 mb-1">Ciudad</label>
-                        <input type="text" name="ciudad" placeholder="Ciudad" class="border p-2">
-                    </div>  
-                    <div>
-                        <label for="direccion" class="block text-sm font-medium text-black-700 mb-1">Dirección</label>
-                        <input type="text" name="direccion" placeholder="Dirección" class="border p-2">
-                    </div>
-                    <div class="col-span-2">
-                        <label for="mercancia" class="block text-sm font-medium text-black-700 mb-1">Mercancía</label>
-                        <input type="text" name="mercancia" placeholder="Mercancía" class="border p-2 w-full">
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <button style="background-color: #4DC9C2; color: black"  class="w-full bg-green-500 text-black py-2 rounded">
-                        Guardar Proveedor
-                    </button>
-                </div>
-
-            </form>
-        </div>
-
+    <div class="mb-6">
+        <a href="{{ route('proveedores.index') }}"
+           class="inline-flex items-center gap-1 text-sm font-medium transition hover:opacity-70"
+           style="color: #14B8A6;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver a Proveedores
+        </a>
     </div>
 
-</x-app-layout>
+    @if($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+            <ul class="list-disc list-inside space-y-1">
+                @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-2xl">
+        <h2 class="text-lg font-bold text-gray-900 mb-5">Nuevo Proveedor</h2>
+
+        <form action="{{ route('proveedores.store') }}" method="POST">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" name="nombre" value="{{ old('nombre') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
+                    <input type="text" name="empresa" value="{{ old('empresa') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
+                    <input type="text" name="documento" value="{{ old('documento') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" name="telefono" value="{{ old('telefono') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+                    <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+                    <input type="email" name="correo" value="{{ old('correo') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                    <input type="text" name="ciudad" value="{{ old('ciudad') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <input type="text" name="direccion" value="{{ old('direccion') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mercancía</label>
+                    <input type="text" name="mercancia" value="{{ old('mercancia') }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                <a href="{{ route('proveedores.index') }}"
+                   class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
+                        style="background-color: #14B8A6;">
+                    Guardar Proveedor
+                </button>
+            </div>
+        </form>
+    </div>
+</x-with-sidebar-layout>

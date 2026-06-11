@@ -43,8 +43,7 @@ class ProductoController extends Controller
 
     public function create()
     {
-        $materias = MateriaPrima::all();
-        return view('productos.create', compact('materias'));
+        return redirect()->route('productos.index', ['open_modal' => 1]);
     }
 
     public function store(Request $request)

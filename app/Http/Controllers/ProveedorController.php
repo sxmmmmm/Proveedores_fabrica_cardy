@@ -43,7 +43,7 @@ class ProveedorController extends Controller
 
     public function create()
     {
-        return view('proveedores.create');
+        return redirect()->route('proveedores.index', ['open_modal' => 1]);
     }
 
     public function store(Request $request)

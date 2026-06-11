@@ -78,7 +78,7 @@
             action="{{ $importRoute }}"
             method="POST"
             enctype="multipart/form-data"
-            style="display:inline;">
+            style="display:contents;">
             @csrf
             <input
                 type="file"
@@ -91,7 +91,7 @@
             <button
                 type="button"
                 onclick="document.getElementById('{{ $uniqueId }}_file').click()"
-                class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
                 style="background-color: #14B8A6;"
                 onmouseover="this.style.backgroundColor='#0d9488'"
                 onmouseout="this.style.backgroundColor='#14B8A6'">
@@ -105,7 +105,7 @@
 
         {{-- Exportar Excel --}}
         <a href="{{ $exportExcel . $qs }}"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
            style="background-color: #16A34A;"
            onmouseover="this.style.backgroundColor='#15803d'"
            onmouseout="this.style.backgroundColor='#16A34A'">
@@ -118,7 +118,7 @@
 
         {{-- Exportar CSV --}}
         <a href="{{ $exportCsv . $qs }}"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
            style="background-color: #475569;"
            onmouseover="this.style.backgroundColor='#334155'"
            onmouseout="this.style.backgroundColor='#475569'">
@@ -131,7 +131,7 @@
 
         {{-- Exportar PDF --}}
         <a href="{{ $exportPdf . $qs }}"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition"
            style="background-color: #BE123C;"
            onmouseover="this.style.backgroundColor='#9f1239'"
            onmouseout="this.style.backgroundColor='#BE123C'">

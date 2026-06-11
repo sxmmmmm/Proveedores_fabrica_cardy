@@ -3,7 +3,7 @@
     <x-slot name="header">Productos</x-slot>
 
     {{-- ═══ MODAL CREAR PRODUCTO ═══ --}}
-    <div x-data="{ open: {{ $errors->any() && !old('_edit_id') ? 'true' : 'false' }}, openStock: false }">
+    <div x-data="{ open: {{ ($errors->any() && !old('_edit_id')) || request('open_modal') ? 'true' : 'false' }}, openStock: false }">
 
         <!-- Encabezado -->
         <div class="flex justify-between items-center mb-6">
@@ -339,16 +339,16 @@
                         <td class="px-4 py-3 text-gray-600">${{ number_format($producto->precio, 2) }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ optional($producto->materiaPrima)->nombre ?? 'Sin materia prima' }}</td>
                         <td class="px-4 py-3">
-                            <div class="flex gap-1.5 justify-center">
+                            <div class="flex gap-1.5 justify-center items-center">
                                 <button @click="openEdit = true"
-                                        class="px-3 py-1 rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
+                                        class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                         style="background-color: #14B8A6;">
                                     Editar
                                 </button>
                                 <form action="{{ route('productos.destroy', $producto->id) }}" method="POST"
-                                      onsubmit="return confirm('¿Eliminar este producto?');" style="display:inline;">
+                                      onsubmit="return confirm('¿Eliminar este producto?');" style="display:contents;">
                                     @csrf @method('DELETE')
-                                    <button class="px-3 py-1 rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
+                                    <button class="px-3 py-1.5 min-w-[60px] rounded-lg text-xs font-semibold text-white transition hover:opacity-90"
                                             style="background-color: #E11D48;">
                                         Eliminar
                                     </button>
