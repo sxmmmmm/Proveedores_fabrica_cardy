@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FÁBRICA CARDY - Iniciar Sesión</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    {{-- Alpine cargado en head sin defer para que esté listo antes del render --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -15,10 +14,7 @@
 </head>
 <body style="background-color: #F9FAFB;">
 
-    {{-- ══════════════════════════════════════════════════════
-         MODAL: OLVIDÉ MI CONTRASEÑA
-         Controlado por Alpine en el body directamente
-    ══════════════════════════════════════════════════════ --}}
+    {{-- Modal recuperar contraseña --}}
     <div id="modal-forgot"
          style="display:none; position:fixed; inset:0; z-index:50; background:rgba(0,0,0,0.55);"
          class="flex items-center justify-center p-4">
@@ -34,9 +30,9 @@
                             <i class="fas fa-lock text-white text-sm"></i>
                         </div>
                         <div>
-                            <h3 class="text-base font-bold text-white">Restablecer contraseña</h3>
+                            <h3 class="text-base font-bold text-white">Recuperar contraseña</h3>
                             <p class="text-xs mt-0.5" style="color:#94A3B8;">
-                                El administrador gestionará tu solicitud
+                                Te enviaremos un enlace directo a tu correo
                             </p>
                         </div>
                     </div>
@@ -58,11 +54,9 @@
                 @endif
 
                 <p class="text-sm mb-5" style="color:#475569;">
-                    Ingresa tu correo y el administrador del sistema recibirá tu solicitud.
-                    Te asignará una nueva contraseña y te la enviará por correo.
+                    Ingresa tu correo electrónico y recibirás un enlace para restablecer tu contraseña directamente.
                 </p>
 
-                {{-- Formulario independiente, fuera de cualquier contexto Alpine --}}
                 <form method="POST" action="{{ route('password.email') }}" id="form-forgot">
                     @csrf
                     <div class="mb-4">
@@ -87,7 +81,7 @@
                             class="w-full py-2.5 rounded-lg text-sm font-semibold text-white transition hover:opacity-90"
                             style="background-color: #14B8A6;">
                         <i class="fas fa-paper-plane mr-2"></i>
-                        Enviar solicitud
+                        Enviar enlace de recuperación
                     </button>
                 </form>
             </div>
@@ -101,20 +95,18 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════════════════════
-         LAYOUT PRINCIPAL
-    ══════════════════════════════════════════════════════ --}}
+    {{-- Layout principal --}}
     <div class="min-h-screen flex">
 
-        {{-- Panel izquierdo decorativo --}}
+        {{-- Panel izquierdo --}}
         <div class="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12"
-             style="background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #14B8A6 100%);">
+             style="background: linear-gradient(160deg, #0F172A 0%, #1E3A5F 60%, #14B8A6 100%);">
             <img src="{{ asset('images/logocardy.jpg') }}"
                  alt="Fábrica Cardy"
-                 class="w-40 h-40 object-contain rounded-full shadow-2xl mb-8"
-                 style="border: 4px solid rgba(255,255,255,0.15);"
+                 class="w-28 h-28 object-contain rounded-full mb-8 shadow-2xl"
+                 style="border: 3px solid #14B8A6;"
                  onerror="this.style.display='none'">
-            <h1 class="text-4xl font-bold text-white text-center mb-3 tracking-wide">
+            <h1 class="text-4xl font-black text-center text-white tracking-wide mb-2">
                 FÁBRICA CARDY
             </h1>
             <p class="text-center text-sm font-medium mb-8" style="color:#14B8A6;">
@@ -126,7 +118,7 @@
             </p>
         </div>
 
-        {{-- Panel derecho — Formulario de login --}}
+        {{-- Panel derecho --}}
         <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
             <div class="w-full max-w-md">
 
@@ -146,7 +138,7 @@
                     </p>
                 </div>
 
-                {{-- Error de credenciales --}}
+                {{-- Errores --}}
                 @if($errors->has('email') || $errors->has('password'))
                     <div class="border px-4 py-3 rounded-lg mb-5 text-sm"
                          style="background:#FEF2F2; border-color:#FECACA; color:#DC2626;">
@@ -156,7 +148,6 @@
                     </div>
                 @endif
 
-                {{-- ── Formulario de login — completamente independiente ── --}}
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
 
@@ -239,7 +230,6 @@
         function cerrarModalForgot() {
             document.getElementById('modal-forgot').style.display = 'none';
         }
-        // Cerrar al hacer clic fuera del contenido
         document.getElementById('modal-forgot').addEventListener('click', function(e) {
             if (e.target === this) cerrarModalForgot();
         });
@@ -255,7 +245,6 @@
             }
         }
         @if(session('status'))
-            // Si viene un status (solicitud enviada), reabrir el modal para mostrar el mensaje
             window.addEventListener('load', function() {
                 abrirModalForgot();
             });

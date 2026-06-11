@@ -16,9 +16,10 @@ class ResetPasswordNotification extends BaseResetPassword
     {
         $url = $this->resetUrl($notifiable);
 
-        return new RestablecimientoContraseniaMail(
+        return (new RestablecimientoContraseniaMail(
             nombreUsuario: $notifiable->name ?? 'Usuario',
             resetUrl: $url
-        );
+        ))->to($notifiable->email);
     }
 }
+
